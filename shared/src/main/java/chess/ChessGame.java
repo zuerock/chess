@@ -14,6 +14,16 @@ public class ChessGame {
 
     }
 
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
+    }
+
     /**
      * @return Which team's turn it is
      */
@@ -28,6 +38,11 @@ public class ChessGame {
      */
     public void setTeamTurn(TeamColor team) {
         throw new RuntimeException("Not implemented");
+    }
+
+    @Override
+    public String toString() {
+        return "ChessGame{}";
     }
 
     /**
