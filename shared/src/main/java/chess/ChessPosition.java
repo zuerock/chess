@@ -7,38 +7,26 @@ package chess;
  * signature of the existing methods.
  */
 public class ChessPosition {
+    private int row;
+    private int col;
 
     public ChessPosition(int row, int col) {
+        this.row=row;
+        this.col=col;
     }
 
     /**
      * @return which row this position is in
      * 1 codes for the bottom row
      */
-    public int getRow() {
-        throw new RuntimeException("Not implemented");
-    }
+    public int getRow() { return row; }
+    public void setRow(int row) { this.row=row; }
+
 
     /**
      * @return which column this position is in
      * 1 codes for the left row
      */
-    public int getColumn() {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return super.equals(obj);
-    }
-
-    @Override
-    public String toString() {
-        return super.toString();
-    }
+    public int getColumn() { return col; }
+    public void setColumn(int col) { this.col=col; }
 }

@@ -7,24 +7,15 @@ package chess;
  * signature of the existing methods.
  */
 public class ChessBoard {
+    private ChessPiece piece;
+    private ChessPosition position;
+
 
     public ChessBoard() {
-        
-    }
+        //whitePlayer = new Player(Team.WHITE);
+        //blackPlayer = new Player(Team.BLACK);
+        //currentPlayer = whitePlayer;
 
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return super.equals(obj);
-    }
-
-    @Override
-    public String toString() {
-        return super.toString();
     }
 
     /**
@@ -34,7 +25,8 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        throw new RuntimeException("Not implemented");
+        this.piece = piece;
+        this.position = position;
     }
 
     /**
@@ -44,9 +36,7 @@ public class ChessBoard {
      * @return Either the piece at the position, or null if no piece is at that
      * position
      */
-    public ChessPiece getPiece(ChessPosition position) {
-        throw new RuntimeException("Not implemented");
-    }
+    public ChessPiece getPiece(ChessPosition position) { return this.piece; }
 
     /**
      * Sets the board to the default starting board
