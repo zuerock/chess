@@ -7,23 +7,9 @@ package chess;
  * signature of the existing methods.
  */
 public class ChessBoard {
-    private ChessPosition[][] square;
-    private ChessPosition position;
+    private ChessPiece[][] board = new ChessPiece[8][8];
 
-
-    public ChessBoard() {
-        //whitePlayer = new Player(Team.WHITE);
-        //blackPlayer = new Player(Team.BLACK);
-        //currentPlayer = whitePlayer;
-
-    }
-
-    public ChessPosition getSquare(int x, int y) {
-        if (x < 0 || x > 7 || y < 0 || y > 7) {
-            return null;
-        }
-        return square[x][y];
-    }
+    public ChessBoard() {}
 
     /**
      * Adds a chess piece to the chessboard
@@ -32,8 +18,7 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        this.position = position;
-        position.setPositionPiece(piece);
+        board[position.getRow()][position.getColumn()] = piece;
     }
 
     /**
@@ -44,8 +29,8 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        this.position = position;
-        return this.position.getPositionPiece(); }
+        return board[position.getRow()][position.getColumn()];
+    }
 
     /**
      * Sets the board to the default starting board
