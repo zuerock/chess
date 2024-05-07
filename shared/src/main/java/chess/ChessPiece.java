@@ -11,6 +11,7 @@ import java.util.Collection;
 public class ChessPiece {
     private final PieceType type;
     private final ChessGame.TeamColor pieceColor;
+    private ChessPosition position;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.type = type;
@@ -47,6 +48,6 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-
+    throw new RuntimeException();
     }
 }
