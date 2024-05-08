@@ -13,29 +13,22 @@ import java.util.Objects;
 public class ChessGame  {
 
     private ChessBoard chessBoard;
-    private TeamColor currentTurn;
+    private TeamColor currentPlayer;
     private boolean gameOver;
 
     public ChessGame() {
         this.chessBoard = new ChessBoard();
         this.chessBoard.resetBoard();
-        this.currentTurn = TeamColor.WHITE;
+        this.currentPlayer = TeamColor.WHITE;
         this.gameOver = false;
     }
-
-    public boolean isGameOver() {
-        return gameOver;
-    }
-
-    public void setGameOver(boolean gameOver) {
-        this.gameOver = gameOver;
-    }
+    
 
     /**
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        return currentTurn;
+        return currentPlayer;
     }
 
     /**
@@ -44,7 +37,7 @@ public class ChessGame  {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        currentTurn = team;
+        currentPlayer = team;
     }
 
     /**
@@ -65,7 +58,7 @@ public class ChessGame  {
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece currPiece = chessBoard.getPiece(startPosition);
         Collection<ChessMove> pieceMoves = new HashSet<>();
-        Collection<ChessMove> valMoves = new HashSet<>();
+        Collection<ChessMove> validMove = new HashSet<>();
 
         if (currPiece == null || currPiece.pieceMoves(chessBoard, startPosition).isEmpty()) {
             return null;
@@ -86,12 +79,12 @@ public class ChessGame  {
 
                 // If move puts us into check, remove it from the moves
                 if (!altGame.isInCheck(currPiece.getTeamColor())) {
-                    valMoves.add(move);
+                    validMove.add(move);
                 }
             }
         }
 
-        return valMoves;
+        return validMove;
     }
 
     /**
@@ -108,23 +101,23 @@ public class ChessGame  {
         // Get current piece
         ChessPiece currPiece = this.chessBoard.getPiece(startPos);
 
-        if (isInCheckmate(currentTurn)) {
+        if (isInCheckmate(currentPlayer)) {
             throw new InvalidMoveException("ERROR: IN CHECKMATE");
         }
 
         // Check that it's the piece's turn
         if (currPiece.getTeamColor() == getTeamTurn()) {
-            Collection<ChessMove> valMoves = validMoves(startPos);
+            Collection<ChessMove> validMove = validMoves(startPos);
             // Is the move valid?
-            if (valMoves == null) {
+            if (validMove == null) {
                 throw new InvalidMoveException("ERROR: NO VALID MOVES EXIST");
-            } else if (!(valMoves.contains(move))) {
+            } else if (!(validMove.contains(move))) {
                 throw new InvalidMoveException("ERROR: INVALID MOVE");
             }
             // Are we in check?
             if (isInCheck(getTeamTurn())) {
                 // Will this move take us out of check?
-                if (this.chessBoard.getPiece(endPos) == null || (this.chessBoard.getPiece(endPos) != null && this.chessBoard.getPiece(endPos).getTeamColor() != currentTurn)) {
+                if (this.chessBoard.getPiece(endPos) == null || (this.chessBoard.getPiece(endPos) != null && this.chessBoard.getPiece(endPos).getTeamColor() != currentPlayer)) {
                     // Create alternate universe game to see if move will take us out of check
                     ChessGame altGame = this.clone();
                     altGame.chessBoard.addPiece(endPos, currPiece);
@@ -153,13 +146,13 @@ public class ChessGame  {
             throw new InvalidMoveException("ERROR: WRONG TURN");
         }
         // Change turn to the other team
-        currentTurn = currPiece.getTeamColor() == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
+        currentPlayer = currPiece.getTeamColor() == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
     }
 
     // Promoting Pawn Helper
     public void isPromotingPawn(ChessPiece currPiece, ChessPiece.PieceType promoPiece, ChessPosition startPos, ChessPosition endPos){
         if (promoPiece != null) {
-            ChessPiece promotedPiece = new ChessPiece(currentTurn, promoPiece);
+            ChessPiece promotedPiece = new ChessPiece(currentPlayer, promoPiece);
             this.chessBoard.addPiece(endPos, promotedPiece);
             this.chessBoard.addPiece(startPos, null);
         } else {
@@ -210,7 +203,7 @@ public class ChessGame  {
         // Let's assume we're not in checkmate and then prove that we are
         boolean inCheckmate = false;
 
-        if (!isInCheck(currentTurn)) return false;
+        if (!isInCheck(currentPlayer)) return false;
 
         // Try to move all friendly team pieces. If any of them take us out of check, keep inCheckmate as false. Otherwise, make it true
         for (int i = 1; i < 9; i++) {
@@ -269,7 +262,7 @@ public class ChessGame  {
                         ChessPosition endPos = move.getEndPosition();
                         ChessPosition startPos = move.getStartPosition();
 
-                        if (this.chessBoard.getPiece(endPos) == null || (this.chessBoard.getPiece(endPos) != null && this.chessBoard.getPiece(endPos).getTeamColor() != currentTurn)) {
+                        if (this.chessBoard.getPiece(endPos) == null || (this.chessBoard.getPiece(endPos) != null && this.chessBoard.getPiece(endPos).getTeamColor() != currentPlayer)) {
                             // Create alternate universe game to see if move will put us into check
                             ChessGame altGame = this.clone();
                             altGame.chessBoard.addPiece(endPos, friendlyPiece);
@@ -313,19 +306,19 @@ public class ChessGame  {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChessGame chessGame = (ChessGame) o;
-        return Objects.deepEquals(chessBoard, chessGame.chessBoard) && currentTurn == chessGame.currentTurn;
+        return Objects.deepEquals(chessBoard, chessGame.chessBoard) && currentPlayer == chessGame.currentPlayer;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(chessBoard, currentTurn);
+        return Objects.hash(chessBoard, currentPlayer);
     }
 
     @Override
     public String toString() {
         return "ChessGame{" +
                 "chessBoard=" + chessBoard +
-                ", currentTurn=" + currentTurn +
+                ", currentPlayer=" + currentPlayer +
                 '}';
     }
 
