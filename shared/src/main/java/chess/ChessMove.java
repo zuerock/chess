@@ -18,33 +18,9 @@ public class ChessMove {
         this.promotionPiece = promotionPiece;
     }
 
-    /**
-     * @return ChessPosition of starting location
-     */
-    public ChessPosition getStartPosition() {
-        return this.startPosition;
-    }
-
-    /**
-     * @return ChessPosition of ending location
-     */
-    public ChessPosition getEndPosition() {
-        return this.endPosition;
-    }
-
-    /**
-     * Gets the type of piece to promote a pawn to if pawn promotion is part of this
-     * chess move
-     *
-     * @return Type of piece to promote a pawn to, or null if no promotion
-     */
-    public ChessPiece.PieceType getPromotionPiece() {
-        return this.promotionPiece;
-    }
-
     @Override
     public int hashCode() {
-        int hash = 0;
+        int hash;
         hash = startPosition.getRow() * 157 + startPosition.getColumn();
         hash += endPosition.getRow() * 31 + endPosition.getColumn();
         if(promotionPiece != null){
@@ -74,11 +50,9 @@ public class ChessMove {
             return true;
         }
 
-        if(!(obj instanceof ChessMove)){
+        if(!(obj instanceof ChessMove c)){
             return false;
         }
-
-        ChessMove c = (ChessMove) obj;
 
         return this.startPosition.equals(c.startPosition) && this.endPosition.equals(c.endPosition) && promotionPiece == c.promotionPiece;
     }
