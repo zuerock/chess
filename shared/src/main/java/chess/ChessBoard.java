@@ -206,23 +206,3 @@ public class ChessBoard {
         }
         sb.append(black).append(" ").append(String.format("%2d", i + 1)).append(reset).append("\n");
     }
-
-    @Override
-    public ChessBoard clone() {
-        try {
-            ChessBoard clone = (ChessBoard) super.clone();
-            clone.board = new ChessPiece[8][8];
-
-            for (int row = 0; row < 8; row++) {
-                for (int col = 0; col < 8; col++) {
-                    if (this.board[row][col] != null) {
-                        clone.board[row][col] = this.board[row][col].clone();
-                    }
-                }
-            }
-            return clone;
-        } catch (CloneNotSupportedException e) {
-            throw new InternalError(e);  // This should not happen
-        }
-    }
-}
