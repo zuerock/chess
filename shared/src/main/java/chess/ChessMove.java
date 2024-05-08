@@ -9,12 +9,12 @@ package chess;
 public class ChessMove {
 
     private final ChessPosition startPosition;
-    private final ChessPosition endPostion;
+    private final ChessPosition endPosition;
     private final ChessPiece.PieceType promotionPiece;
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
                      ChessPiece.PieceType promotionPiece) {
         this.startPosition = startPosition;
-        this.endPostion = endPosition;
+        this.endPosition = endPosition;
         this.promotionPiece = promotionPiece;
     }
 
@@ -29,7 +29,7 @@ public class ChessMove {
      * @return ChessPosition of ending location
      */
     public ChessPosition getEndPosition() {
-        return this.endPostion;
+        return this.endPosition;
     }
 
     /**
@@ -46,7 +46,7 @@ public class ChessMove {
     public int hashCode() {
         int hash = 0;
         hash = startPosition.getRow() * 157 + startPosition.getColumn();
-        hash += endPostion.getRow() * 31 + endPostion.getColumn();
+        hash += endPosition.getRow() * 31 + endPosition.getColumn();
         if(promotionPiece != null){
             switch (promotionPiece){
                 case QUEEN:
@@ -80,14 +80,14 @@ public class ChessMove {
 
         ChessMove c = (ChessMove) obj;
 
-        return this.startPosition.equals(c.startPosition) && this.endPostion.equals(c.endPostion) && promotionPiece == c.promotionPiece;
+        return this.startPosition.equals(c.startPosition) && this.endPosition.equals(c.endPosition) && promotionPiece == c.promotionPiece;
     }
 
     @Override
     public String toString() {
         return "Move{" +
                 startPosition +
-                ", " + endPostion +
+                ", " + endPosition +
                 ", " + promotionPiece +
                 "}\n";
     }

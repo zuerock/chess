@@ -10,7 +10,7 @@ import java.util.Objects;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
-public class ChessGame implements Cloneable {
+public class ChessGame  {
 
     private ChessBoard chessBoard;
     private TeamColor currentTurn;
