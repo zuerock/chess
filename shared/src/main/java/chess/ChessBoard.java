@@ -9,12 +9,10 @@ import java.util.Collection;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
-public class ChessBoard {
+public class ChessBoard implements Cloneable{
 
     private ChessPiece[][] board = new ChessPiece[8][8];
-
-    public ChessBoard() {
-    }
+    public ChessBoard() {}
 
     /**
      * Adds a chess piece to the chessboard
@@ -48,7 +46,7 @@ public class ChessBoard {
         board = new ChessPiece[8][8];
 
         // White team
-        this.addPiece(new ChessPosition(1, 1), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK));
+        this.addPiece(new ChessPosition(1,1), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK));
         this.addPiece(new ChessPosition(1, 2), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT));
         this.addPiece(new ChessPosition(1, 3), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP));
         this.addPiece(new ChessPosition(1, 4), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN));
@@ -56,17 +54,17 @@ public class ChessBoard {
         this.addPiece(new ChessPosition(1, 6), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP));
         this.addPiece(new ChessPosition(1, 7), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT));
         this.addPiece(new ChessPosition(1, 8), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK));
-        this.addPiece(new ChessPosition(2, 1), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
-        this.addPiece(new ChessPosition(2, 2), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
-        this.addPiece(new ChessPosition(2, 3), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
-        this.addPiece(new ChessPosition(2, 4), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
-        this.addPiece(new ChessPosition(2, 5), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
-        this.addPiece(new ChessPosition(2, 6), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
-        this.addPiece(new ChessPosition(2, 7), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
-        this.addPiece(new ChessPosition(2, 8), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
+        this.addPiece(new ChessPosition(2,1), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
+        this.addPiece(new ChessPosition(2,2), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
+        this.addPiece(new ChessPosition(2,3), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
+        this.addPiece(new ChessPosition(2,4), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
+        this.addPiece(new ChessPosition(2,5), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
+        this.addPiece(new ChessPosition(2,6), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
+        this.addPiece(new ChessPosition(2,7), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
+        this.addPiece(new ChessPosition(2,8), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
 
         // Black team
-        this.addPiece(new ChessPosition(8, 1), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK));
+        this.addPiece(new ChessPosition(8,1), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK));
         this.addPiece(new ChessPosition(8, 2), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT));
         this.addPiece(new ChessPosition(8, 3), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP));
         this.addPiece(new ChessPosition(8, 4), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN));
@@ -74,14 +72,14 @@ public class ChessBoard {
         this.addPiece(new ChessPosition(8, 6), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP));
         this.addPiece(new ChessPosition(8, 7), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT));
         this.addPiece(new ChessPosition(8, 8), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK));
-        this.addPiece(new ChessPosition(7, 1), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
-        this.addPiece(new ChessPosition(7, 2), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
-        this.addPiece(new ChessPosition(7, 3), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
-        this.addPiece(new ChessPosition(7, 4), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
-        this.addPiece(new ChessPosition(7, 5), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
-        this.addPiece(new ChessPosition(7, 6), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
-        this.addPiece(new ChessPosition(7, 7), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
-        this.addPiece(new ChessPosition(7, 8), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
+        this.addPiece(new ChessPosition(7,1), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
+        this.addPiece(new ChessPosition(7,2), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
+        this.addPiece(new ChessPosition(7,3), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
+        this.addPiece(new ChessPosition(7,4), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
+        this.addPiece(new ChessPosition(7,5), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
+        this.addPiece(new ChessPosition(7,6), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
+        this.addPiece(new ChessPosition(7,7), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
+        this.addPiece(new ChessPosition(7,8), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
     }
 
     @Override
@@ -159,7 +157,8 @@ public class ChessBoard {
             sb.append(bg);
             if (isPossibleMove(currentPosition, possibleMoves)) {
                 sb.append(bgGreen);
-            } else if (currentPosition.equals(yellowPos)) {
+            }
+            else if (currentPosition.equals(yellowPos)){
                 sb.append(bgYellow);
             }
             if (board[i][j] == null) {
@@ -168,27 +167,13 @@ public class ChessBoard {
                 String color = (board[i][j].getTeamColor() == ChessGame.TeamColor.WHITE) ? red : blue;
                 char pieceChar;
                 switch (board[i][j].getPieceType()) {
-                    case PAWN:
-                        pieceChar = 'P';
-                        break;
-                    case ROOK:
-                        pieceChar = 'R';
-                        break;
-                    case KNIGHT:
-                        pieceChar = 'N';
-                        break;
-                    case BISHOP:
-                        pieceChar = 'B';
-                        break;
-                    case KING:
-                        pieceChar = 'K';
-                        break;
-                    case QUEEN:
-                        pieceChar = 'Q';
-                        break;
-                    default:
-                        pieceChar = ' ';
-                        break;
+                    case PAWN: pieceChar = 'P'; break;
+                    case ROOK: pieceChar = 'R'; break;
+                    case KNIGHT: pieceChar = 'N'; break;
+                    case BISHOP: pieceChar = 'B'; break;
+                    case KING: pieceChar = 'K'; break;
+                    case QUEEN: pieceChar = 'Q'; break;
+                    default: pieceChar = ' '; break;
                 }
                 sb.append(color).append(" ").append(pieceChar).append(" ").append(reset); // Added a space before and after each piece
             }
@@ -219,31 +204,36 @@ public class ChessBoard {
                 String color = (board[i][j].getTeamColor() == ChessGame.TeamColor.WHITE) ? red : blue;
                 char pieceChar;
                 switch (board[i][j].getPieceType()) {
-                    case PAWN:
-                        pieceChar = 'P';
-                        break;
-                    case ROOK:
-                        pieceChar = 'R';
-                        break;
-                    case KNIGHT:
-                        pieceChar = 'N';
-                        break;
-                    case BISHOP:
-                        pieceChar = 'B';
-                        break;
-                    case KING:
-                        pieceChar = 'K';
-                        break;
-                    case QUEEN:
-                        pieceChar = 'Q';
-                        break;
-                    default:
-                        pieceChar = ' ';
-                        break;
+                    case PAWN: pieceChar = 'P'; break;
+                    case ROOK: pieceChar = 'R'; break;
+                    case KNIGHT: pieceChar = 'N'; break;
+                    case BISHOP: pieceChar = 'B'; break;
+                    case KING: pieceChar = 'K'; break;
+                    case QUEEN: pieceChar = 'Q'; break;
+                    default: pieceChar = ' '; break;
                 }
                 sb.append(bg).append(color).append(" ").append(pieceChar).append(" ").append(reset); // Added a space before and after each piece
             }
         }
         sb.append(black).append(" ").append(String.format("%2d", i + 1)).append(reset).append("\n");
+    }
+
+    @Override
+    public ChessBoard clone() {
+        try {
+            ChessBoard clone = (ChessBoard) super.clone();
+            clone.board = new ChessPiece[8][8];
+
+            for (int row = 0; row < 8; row++) {
+                for (int col = 0; col < 8; col++) {
+                    if (this.board[row][col] != null) {
+                        clone.board[row][col] = this.board[row][col].clone();
+                    }
+                }
+            }
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new InternalError(e);  // This should not happen
+        }
     }
 }
