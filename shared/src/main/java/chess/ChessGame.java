@@ -14,37 +14,10 @@ public class ChessGame {
 
     private ChessBoard chessBoard;
     private TeamColor currentTurn;
-    private boolean gameOver;
 
     public ChessGame() {
         this.chessBoard = new ChessBoard();
         this.chessBoard.resetBoard();
-        this.currentTurn = TeamColor.WHITE;
-        this.gameOver = false;
-    }
-
-    public boolean isGameOver() {
-        return gameOver;
-    }
-
-    public void setGameOver(boolean gameOver) {
-        this.gameOver = gameOver;
-    }
-
-    /**
-     * @return Which team's turn it is
-     */
-    public TeamColor getTeamTurn() {
-        return currentTurn;
-    }
-
-    /**
-     * Set's which teams turn it is
-     *
-     * @param team the team whose turn it is
-     */
-    public void setTeamTurn(TeamColor team) {
-        currentTurn = team;
     }
 
     /**
