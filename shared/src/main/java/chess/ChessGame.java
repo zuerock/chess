@@ -22,8 +22,6 @@ public class ChessGame {
 
     }
 
-
-
     /**
      * Enum identifying the 2 possible teams in a chess game
      */
@@ -43,24 +41,6 @@ public class ChessGame {
         ChessPiece currPiece = chessBoard.getPiece(startPosition);
 
         return new HashSet<>();
-    }
-
-    /**
-     * Sets this game's chessboard with a given board
-     *
-     * @param board the new board to use
-     */
-    public void setBoard(ChessBoard board) {
-        this.chessBoard = board;
-    }
-
-    /**
-     * Gets the current chessboard
-     *
-     * @return the chessboard
-     */
-    public ChessBoard getBoard() {
-        return this.chessBoard;
     }
 
     @Override
