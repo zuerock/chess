@@ -84,94 +84,6 @@ public class ChessBoard {
         return Arrays.deepEquals(board, that.board);
     }
 
-    // COLORS
-    String reset = "\u001B[0m";
-    String black = "\u001B[30m";
-    String red = "\u001B[31m";
-    String blue = "\u001B[34m";
-    String bgWhite = "\u001B[47m";
-    String bgGreen = "\u001B[42m";
-    String bgYellow = "\u001B[43m";
-    String bgBlack = "\u001B[40m";
-
-    public String toString(String teamColor) {
-        StringBuilder sb = new StringBuilder();
-
-        sb = buildBoard(teamColor, sb, reset, black, red, blue, bgWhite, bgBlack);
-
-        return sb.toString();
-    }
-
-    private StringBuilder buildBoard(String teamColor, StringBuilder sb, String reset, String black, String red, String blue, String bgWhite, String bgBlack) {
-        sb.append(black).append(String.format("%4s", " ")).append("a  b  c  d  e  f  g  h").append(reset).append("\n");
-
-        if (teamColor == null || teamColor.equals("WHITE")) {
-            for (int i = 7; i >= 0; i--) {
-                appendRow(sb, i, reset, black, red, blue, bgWhite, bgBlack);
-            }
-        } else {
-            for (int i = 0; i < 8; i++) {
-                appendRow(sb, i, reset, black, red, blue, bgWhite, bgBlack);
-            }
-        }
-
-        sb.append(black).append(String.format("%4s", " ")).append("a  b  c  d  e  f  g  h").append(reset).append("\n");
-        return sb;
-    }
-
-    public String toStringHighlighted(String teamColor, Collection<ChessMove> possibleMoves, ChessPosition yellowPos) {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(black).append(String.format("%4s", " ")).append("a  b  c  d  e  f  g  h").append(reset).append("\n");
-
-        if (teamColor == null || teamColor.equals("WHITE")) {
-            for (int i = 7; i >= 0; i--) {
-                sb = appendHighlightedRow(sb, i, reset, black, red, blue, bgWhite, bgBlack, possibleMoves, yellowPos);
-            }
-        } else {
-            for (int i = 0; i < 8; i++) {
-                sb = appendHighlightedRow(sb, i, reset, black, red, blue, bgWhite, bgBlack, possibleMoves, yellowPos);
-            }
-        }
-
-        sb.append(black).append(String.format("%4s", " ")).append("a  b  c  d  e  f  g  h").append(reset).append("\n");
-        return sb.toString();
-    }
-
-    private StringBuilder appendHighlightedRow(StringBuilder sb, int i, String reset, String black, String red, String blue, String bgWhite, String bgBlack, Collection<ChessMove> possibleMoves, ChessPosition yellowPos) {
-        sb.append(black).append(String.format("%2d", i + 1)).append(" ");
-        for (int j = 0; j < 8; j++) {
-            ChessPosition currentPosition = new ChessPosition(i + 1, j + 1);
-            String bg = ((i + j) % 2 == 0) ? bgWhite : bgBlack;
-            sb.append(bg);
-            if (isPossibleMove(currentPosition, possibleMoves)) {
-                sb.append(bgGreen);
-            }
-            else if (currentPosition.equals(yellowPos)){
-                sb.append(bgYellow);
-            }
-            if (board[i][j] == null) {
-                sb.append(String.format("%3s", " ")).append(reset); // Increased space for empty squares
-            } else {
-                String color = (board[i][j].getTeamColor() == ChessGame.TeamColor.WHITE) ? red : blue;
-                char pieceChar;
-                switch (board[i][j].getPieceType()) {
-                    case PAWN: pieceChar = 'P'; break;
-                    case ROOK: pieceChar = 'R'; break;
-                    case KNIGHT: pieceChar = 'N'; break;
-                    case BISHOP: pieceChar = 'B'; break;
-                    case KING: pieceChar = 'K'; break;
-                    case QUEEN: pieceChar = 'Q'; break;
-                    default: pieceChar = ' '; break;
-                }
-                sb.append(color).append(" ").append(pieceChar).append(" ").append(reset); // Added a space before and after each piece
-            }
-        }
-        sb.append(black).append(" ").append(String.format("%2d", i + 1)).append(reset).append("\n");
-
-        return sb;
-    }
-
     private boolean isPossibleMove(ChessPosition position, Collection<ChessMove> possibleMoves) {
         if (possibleMoves != null) {
             for (ChessMove move : possibleMoves) {
@@ -181,29 +93,5 @@ public class ChessBoard {
             }
         }
         return false;
-    }
-
-    private void appendRow(StringBuilder sb, int i, String reset, String black, String red, String blue, String bgWhite, String bgBlack) {
-        sb.append(black).append(String.format("%2d", i + 1)).append(" ");
-        for (int j = 0; j < 8; j++) {
-            String bg = ((i + j) % 2 == 0) ? bgWhite : bgBlack;
-            if (board[i][j] == null) {
-                sb.append(bg).append(String.format("%3s", " ")).append(reset); // Increased space for empty squares
-            } else {
-                String color = (board[i][j].getTeamColor() == ChessGame.TeamColor.WHITE) ? red : blue;
-                char pieceChar;
-                switch (board[i][j].getPieceType()) {
-                    case PAWN: pieceChar = 'P'; break;
-                    case ROOK: pieceChar = 'R'; break;
-                    case KNIGHT: pieceChar = 'N'; break;
-                    case BISHOP: pieceChar = 'B'; break;
-                    case KING: pieceChar = 'K'; break;
-                    case QUEEN: pieceChar = 'Q'; break;
-                    default: pieceChar = ' '; break;
-                }
-                sb.append(bg).append(color).append(" ").append(pieceChar).append(" ").append(reset); // Added a space before and after each piece
-            }
-        }
-        sb.append(black).append(" ").append(String.format("%2d", i + 1)).append(reset).append("\n");
     }
 }
