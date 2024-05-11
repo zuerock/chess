@@ -6,8 +6,8 @@ import java.util.Objects;
 
 public class ChessPiece {
 
-    private PieceType type;
-    private ChessGame.TeamColor color;
+    private final PieceType type;
+    private final ChessGame.TeamColor color;
 
     public ChessPiece(ChessGame.TeamColor color, ChessPiece.PieceType type) {
         this.type = type;

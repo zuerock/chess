@@ -93,4 +93,24 @@ public class ChessBoard implements Cloneable{
         ChessBoard that = (ChessBoard) o;
         return Arrays.deepEquals(board, that.board);
     }
+
+    @Override
+    public ChessBoard clone() {
+        try {
+            ChessBoard clone = (ChessBoard) super.clone();
+            clone.board = new ChessPiece[8][8];
+
+            for (int row = 0; row < 8; row++) {
+                for (int column = 0; column < 8; column++) {
+                    if (this.board[row][column] != null) {
+                        clone.board[row][column] = this.board[row][column].clone();
+                    }
+                }
+            }
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new InternalError(e);  // This should not happen
+        }
+    }
+    }
 }
