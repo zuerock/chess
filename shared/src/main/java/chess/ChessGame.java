@@ -266,13 +266,13 @@ public class ChessGame implements Cloneable {
                     Collection<ChessMove> friendlyMoves = friendlyPiece.pieceMoves(this.chessBoard, friendlyPosition);
                     for (ChessMove move : friendlyMoves) {
                         // Will this move put us into check?
-                        ChessPosition endPos = move.getEndPosition();
+                        ChessPosition endPosition = move.getEndPosition();
                         ChessPosition startPos = move.getStartPosition();
 
-                        if (this.chessBoard.getPiece(endPos) == null || (this.chessBoard.getPiece(endPos) != null && this.chessBoard.getPiece(endPos).getTeamColor() != currentTurn)) {
+                        if (this.chessBoard.getPiece(endPosition) == null || (this.chessBoard.getPiece(endPosition) != null && this.chessBoard.getPiece(endPosition).getTeamColor() != currentTurn)) {
                             // Create alternate universe game to see if move will put us into check
                             ChessGame altGame = this.clone();
-                            altGame.chessBoard.addPiece(endPos, friendlyPiece);
+                            altGame.chessBoard.addPiece(endPosition, friendlyPiece);
                             altGame.chessBoard.addPiece(startPos, null);
 
                             // If all moves keep us in check, we're in checkmate
