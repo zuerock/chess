@@ -18,7 +18,26 @@ public class ChessMove {
         this.endPosition = endPosition;
         this.promotionPiece = promotionPiece;
     }
+    public ChessPosition getStartPosition() {
+        return this.startPosition;
+    }
 
+    /**
+     * @return ChessPosition of ending location
+     */
+    public ChessPosition getEndPosition() {
+        return this.endPosition;
+    }
+
+    /**
+     * Gets the type of piece to promote a pawn to if pawn promotion is part of this
+     * chess move
+     *
+     * @return Type of piece to promote a pawn to, or null if no promotion
+     */
+    public ChessPiece.PieceType getPromotionPiece() {
+        return this.promotionPiece;
+    }
     @Override
     public int hashCode() {
         int hash;

@@ -10,20 +10,19 @@ import java.util.Objects;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
-public class ChessGame {
+public class ChessGame implements Cloneable {
 
     private ChessBoard chessBoard;
     private TeamColor currentTurn;
     private boolean gameOver;
-
 
     public ChessGame() {
         this.chessBoard = new ChessBoard();
         this.chessBoard.resetBoard();
         this.currentTurn = TeamColor.WHITE;
         this.gameOver = false;
-
     }
+
     public boolean isGameOver() {
         return gameOver;
     }
@@ -32,13 +31,22 @@ public class ChessGame {
         this.gameOver = gameOver;
     }
 
+    /**
+     * @return Which team's turn it is
+     */
     public TeamColor getTeamTurn() {
         return currentTurn;
     }
 
+    /**
+     * Set's which teams turn it is
+     *
+     * @param team the team whose turn it is
+     */
     public void setTeamTurn(TeamColor team) {
         currentTurn = team;
     }
+
     /**
      * Enum identifying the 2 possible teams in a chess game
      */
@@ -55,9 +63,10 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        ChessPiece currentPiece = chessBoard.getPiece(startPosition);
+        ChessPiece currPiece = chessBoard.getPiece(startPosition);
         Collection<ChessMove> pieceMoves = new HashSet<>();
         Collection<ChessMove> valMoves = new HashSet<>();
+
         if (currPiece == null || currPiece.pieceMoves(chessBoard, startPosition).isEmpty()) {
             return null;
         } else {
@@ -85,6 +94,12 @@ public class ChessGame {
         return valMoves;
     }
 
+    /**
+     * Makes a move in a chess game
+     *
+     * @param move chess move to preform
+     * @throws InvalidMoveException if move is invalid
+     */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPosition startPos = move.getStartPosition();
         ChessPosition endPos = move.getEndPosition();
@@ -275,23 +290,53 @@ public class ChessGame {
         return inStalemate;
     }
 
+    /**
+     * Sets this game's chessboard with a given board
+     *
+     * @param board the new board to use
+     */
+    public void setBoard(ChessBoard board) {
+        this.chessBoard = board;
+    }
+
+    /**
+     * Gets the current chessboard
+     *
+     * @return the chessboard
+     */
+    public ChessBoard getBoard() {
+        return this.chessBoard;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChessGame chessGame = (ChessGame) o;
-        return Objects.deepEquals(chessBoard, chessGame.chessBoard);
+        return Objects.deepEquals(chessBoard, chessGame.chessBoard) && currentTurn == chessGame.currentTurn;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(chessBoard);
+        return Objects.hash(chessBoard, currentTurn);
     }
 
     @Override
     public String toString() {
         return "ChessGame{" +
                 "chessBoard=" + chessBoard +
+                ", currentTurn=" + currentTurn +
                 '}';
+    }
+
+    @Override
+    public ChessGame clone() {
+        try {
+            ChessGame clone = (ChessGame) super.clone();
+            clone.chessBoard = this.chessBoard.clone();
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new InternalError(e);
+        }
     }
 }
