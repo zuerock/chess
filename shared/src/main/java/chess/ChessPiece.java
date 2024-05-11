@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 
-public class ChessPiece {
+public class ChessPiece implements Cloneable{
 
     private final PieceType type;
     private final ChessGame.TeamColor color;
@@ -81,43 +81,43 @@ public class ChessPiece {
         // DownRight
         potentialPositions.add(new ChessPosition(currentRow - 1, currentCol + 1));
 
-        for (ChessPosition pos : potentialPositions) {
-            if (obCheck(pos, myBoard)) {
+        for (ChessPosition position : potentialPositions) {
+            if (obCheck(position, myBoard)) {
                 continue;
             } else {
-                // Check if pos isn't in enemy king's bubble. If it is, continue
+                // Check if position isn't in enemy king's bubble. If it is, continue
                 // Column sweeps
-                for (int i = pos.getRow() - 2; i < pos.getRow() + 2; i++) {
+                for (int i = position.getRow() - 2; i < position.getRow() + 2; i++) {
                     // 2 left column
-                    ChessPosition checkPos = new ChessPosition(i, pos.getColumn() - 2);
+                    ChessPosition checkPos = new ChessPosition(i, position.getColumn() - 2);
                     // Make sure checkPos is in bounds
-                    if (outOfRange(myBoard, currentPosition, possibleMoves, pos, checkPos)) continue;
+                    if (outOfRange(myBoard, currentPosition, possibleMoves, position, checkPos)) continue;
                     // 1 left column
-                    checkPos = new ChessPosition(i, pos.getColumn() - 1);
+                    checkPos = new ChessPosition(i, position.getColumn() - 1);
                     // Make sure checkPos is in bounds
-                    if (outOfRange(myBoard, currentPosition, possibleMoves, pos, checkPos)) continue;
+                    if (outOfRange(myBoard, currentPosition, possibleMoves, position, checkPos)) continue;
                     // 1 right column
-                    checkPos = new ChessPosition(i, pos.getColumn() + 1);
+                    checkPos = new ChessPosition(i, position.getColumn() + 1);
                     // Make sure checkPos is in bounds
-                    if (outOfRange(myBoard, currentPosition, possibleMoves, pos, checkPos)) continue;
+                    if (outOfRange(myBoard, currentPosition, possibleMoves, position, checkPos)) continue;
                     // 2 right column
-                    checkPos = new ChessPosition(i, pos.getColumn() + 2);
-                    if (outOfRange(myBoard, currentPosition, possibleMoves, pos, checkPos)) continue;
+                    checkPos = new ChessPosition(i, position.getColumn() + 2);
+                    if (outOfRange(myBoard, currentPosition, possibleMoves, position, checkPos)) continue;
                 }
                 // Row sweeps
-                for (int j = pos.getColumn() - 2; j < pos.getColumn() + 2; j++) {
+                for (int j = position.getColumn() - 2; j < position.getColumn() + 2; j++) {
                     // 2 up row
-                    ChessPosition checkPos = new ChessPosition(pos.getRow() + 2, j);
-                    if (outOfRange(myBoard, currentPosition, possibleMoves, pos, checkPos)) continue;
+                    ChessPosition checkPos = new ChessPosition(position.getRow() + 2, j);
+                    if (outOfRange(myBoard, currentPosition, possibleMoves, position, checkPos)) continue;
                     // 1 up row
-                    checkPos = new ChessPosition(pos.getRow() + 1, j);
-                    if (outOfRange(myBoard, currentPosition, possibleMoves, pos, checkPos)) continue;
+                    checkPos = new ChessPosition(position.getRow() + 1, j);
+                    if (outOfRange(myBoard, currentPosition, possibleMoves, position, checkPos)) continue;
                     // 1 down row
-                    checkPos = new ChessPosition(pos.getRow() - 1, j);
-                    if (outOfRange(myBoard, currentPosition, possibleMoves, pos, checkPos)) continue;
+                    checkPos = new ChessPosition(position.getRow() - 1, j);
+                    if (outOfRange(myBoard, currentPosition, possibleMoves, position, checkPos)) continue;
                     // 2 down row
-                    checkPos = new ChessPosition(pos.getRow() - 2, j);
-                    if (outOfRange(myBoard, currentPosition, possibleMoves, pos, checkPos)) continue;
+                    checkPos = new ChessPosition(position.getRow() - 2, j);
+                    if (outOfRange(myBoard, currentPosition, possibleMoves, position, checkPos)) continue;
                 }
             }
         }
@@ -125,12 +125,12 @@ public class ChessPiece {
         return possibleMoves;
     }
 
-    public boolean outOfRange(ChessBoard myBoard, ChessPosition currentPosition, Collection<ChessMove> possibleMoves, ChessPosition pos, ChessPosition checkPos) {
+    public boolean outOfRange(ChessBoard myBoard, ChessPosition currentPosition, Collection<ChessMove> possibleMoves, ChessPosition position, ChessPosition checkPos) {
         if (checkPos.getRow() < 1 || checkPos.getRow() > 8 || checkPos.getColumn() < 1 || checkPos.getColumn() > 8) {
             return true;
         }
         if (myBoard.getPiece(checkPos) == null || (myBoard.getPiece(checkPos) != null && myBoard.getPiece(checkPos).type != PieceType.KING)) {
-            possibleMoves.add(new ChessMove(currentPosition, pos, null));
+            possibleMoves.add(new ChessMove(currentPosition, position, null));
         }
         return false;
     }
@@ -180,11 +180,11 @@ public class ChessPiece {
         // RightDown
         potentialPositions.add(new ChessPosition(currentRow - 2, currentCol + 1));
 
-        for (ChessPosition pos : potentialPositions) {
-            if (obCheck(pos, myBoard)) {
+        for (ChessPosition position : potentialPositions) {
+            if (obCheck(position, myBoard)) {
                 continue;
             } else {
-                possibleMoves.add(new ChessMove(currentPosition, pos, null));
+                possibleMoves.add(new ChessMove(currentPosition, position, null));
             }
         }
 
@@ -265,18 +265,18 @@ public class ChessPiece {
             }
         }
 
-        for (ChessPosition pos : potentialPositions) {
-            if (obCheck(pos, myBoard)) {
+        for (ChessPosition position : potentialPositions) {
+            if (obCheck(position, myBoard)) {
                 continue;
             } else {
                 // Check if pawn will move into enemy row. If so, you can do 4 additional moves
-                if ((currentPosition.getRow() == 7 && pos.getRow() == 8) || (currentPosition.getRow() == 2 && pos.getRow() == 1)) {
-                    possibleMoves.add(new ChessMove(currentPosition, pos, PieceType.QUEEN));
-                    possibleMoves.add(new ChessMove(currentPosition, pos, PieceType.BISHOP));
-                    possibleMoves.add(new ChessMove(currentPosition, pos, PieceType.KNIGHT));
-                    possibleMoves.add(new ChessMove(currentPosition, pos, PieceType.ROOK));
+                if ((currentPosition.getRow() == 7 && position.getRow() == 8) || (currentPosition.getRow() == 2 && position.getRow() == 1)) {
+                    possibleMoves.add(new ChessMove(currentPosition, position, PieceType.QUEEN));
+                    possibleMoves.add(new ChessMove(currentPosition, position, PieceType.BISHOP));
+                    possibleMoves.add(new ChessMove(currentPosition, position, PieceType.KNIGHT));
+                    possibleMoves.add(new ChessMove(currentPosition, position, PieceType.ROOK));
                 } else {
-                    possibleMoves.add(new ChessMove(currentPosition, pos, null));
+                    possibleMoves.add(new ChessMove(currentPosition, position, null));
                 }
             }
         }
@@ -359,14 +359,14 @@ public class ChessPiece {
         possibleMoves.add(potMove);
     }
 
-    private boolean obCheck(ChessPosition pos, ChessBoard myBoard) {
+    private boolean obCheck(ChessPosition position, ChessBoard myBoard) {
         boolean ob = false;
         // Remove out of bounds positions
-        if (pos.getRow() < 1 || pos.getRow() > 8 || pos.getColumn() < 1 || pos.getColumn() > 8) {
+        if (position.getRow() < 1 || position.getRow() > 8 || position.getColumn() < 1 || position.getColumn() > 8) {
             ob = true;
         }
         // Check if same team's piece is in the way
-        else if (myBoard.getPiece(pos) != null && myBoard.getPiece(pos).color == this.color) {
+        else if (myBoard.getPiece(position) != null && myBoard.getPiece(position).color == this.color) {
             ob = true;
         }
 

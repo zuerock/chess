@@ -58,40 +58,40 @@ public class ChessGame implements Cloneable {
     /**
      * Gets a valid moves for a piece at the given location
      *
-     * @param startPosition the piece to get valid moves for
+     * @param startPositionition the piece to get valid moves for
      * @return Set of valid moves for requested piece, or null if no piece at
-     * startPosition
+     * startPositionition
      */
-    public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        ChessPiece currPiece = chessBoard.getPiece(startPosition);
+    public Collection<ChessMove> validMoves(ChessPosition startPositionition) {
+        ChessPiece currentPiece = chessBoard.getPiece(startPositionition);
         Collection<ChessMove> pieceMoves = new HashSet<>();
-        Collection<ChessMove> valMoves = new HashSet<>();
+        Collection<ChessMove> validMoves = new HashSet<>();
 
-        if (currPiece == null || currPiece.pieceMoves(chessBoard, startPosition).isEmpty()) {
+        if (currentPiece == null || currentPiece.pieceMoves(chessBoard, startPositionition).isEmpty()) {
             return null;
         } else {
-            pieceMoves = currPiece.pieceMoves(chessBoard, startPosition);
+            pieceMoves = currentPiece.pieceMoves(chessBoard, startPositionition);
         }
 
         for (ChessMove move : pieceMoves) {
             // Will this move put us into check?
-            ChessPosition endPos = move.getEndPosition();
-            ChessPosition startPos = move.getStartPosition();
+            ChessPosition endPosition = move.getEndPosition();
+            ChessPosition startPosition = move.getStartPosition();
 
-            if (this.chessBoard.getPiece(endPos) == null || (this.chessBoard.getPiece(endPos) != null && this.chessBoard.getPiece(endPos).getTeamColor() != currPiece.getTeamColor())) {
+            if (this.chessBoard.getPiece(endPosition) == null || (this.chessBoard.getPiece(endPosition) != null && this.chessBoard.getPiece(endPosition).getTeamColor() != currentPiece.getTeamColor())) {
                 // Create alternate universe game to see if move will put us into check
                 ChessGame altGame = this.clone();
-                altGame.chessBoard.addPiece(endPos, currPiece);
-                altGame.chessBoard.addPiece(startPos, null);
+                altGame.chessBoard.addPiece(endPosition, currentPiece);
+                altGame.chessBoard.addPiece(startPosition, null);
 
                 // If move puts us into check, remove it from the moves
-                if (!altGame.isInCheck(currPiece.getTeamColor())) {
-                    valMoves.add(move);
+                if (!altGame.isInCheck(currentPiece.getTeamColor())) {
+                    validMoves.add(move);
                 }
             }
         }
 
-        return valMoves;
+        return validMoves;
     }
 
     /**
@@ -101,38 +101,38 @@ public class ChessGame implements Cloneable {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        ChessPosition startPos = move.getStartPosition();
-        ChessPosition endPos = move.getEndPosition();
+        ChessPosition startPosition = move.getStartPosition();
+        ChessPosition endPosition = move.getEndPosition();
         ChessPiece.PieceType promoPiece = move.getPromotionPiece();
 
         // Get current piece
-        ChessPiece currPiece = this.chessBoard.getPiece(startPos);
+        ChessPiece currentPiece = this.chessBoard.getPiece(startPosition);
 
         if (isInCheckmate(currentTurn)) {
             throw new InvalidMoveException("ERROR: IN CHECKMATE");
         }
 
         // Check that it's the piece's turn
-        if (currPiece.getTeamColor() == getTeamTurn()) {
-            Collection<ChessMove> valMoves = validMoves(startPos);
+        if (currentPiece.getTeamColor() == getTeamTurn()) {
+            Collection<ChessMove> validMoves = validMoves(startPosition);
             // Is the move valid?
-            if (valMoves == null) {
+            if (validMoves == null) {
                 throw new InvalidMoveException("ERROR: NO VALID MOVES EXIST");
-            } else if (!(valMoves.contains(move))) {
+            } else if (!(validMoves.contains(move))) {
                 throw new InvalidMoveException("ERROR: INVALID MOVE");
             }
             // Are we in check?
             if (isInCheck(getTeamTurn())) {
                 // Will this move take us out of check?
-                if (this.chessBoard.getPiece(endPos) == null || (this.chessBoard.getPiece(endPos) != null && this.chessBoard.getPiece(endPos).getTeamColor() != currentTurn)) {
+                if (this.chessBoard.getPiece(endPosition) == null || (this.chessBoard.getPiece(endPosition) != null && this.chessBoard.getPiece(endPosition).getTeamColor() != currentTurn)) {
                     // Create alternate universe game to see if move will take us out of check
                     ChessGame altGame = this.clone();
-                    altGame.chessBoard.addPiece(endPos, currPiece);
-                    altGame.chessBoard.addPiece(startPos, null);
+                    altGame.chessBoard.addPiece(endPosition, currentPiece);
+                    altGame.chessBoard.addPiece(startPosition, null);
                     if (altGame.isInCheck(getTeamTurn())) {
                         throw new InvalidMoveException("ERROR: STILL IN CHECK");
                     } else {
-                        isPromotingPawn(currPiece, promoPiece, startPos, endPos);
+                        isPromotingPawn(currentPiece, promoPiece, startPosition, endPosition);
                     }
                 } else {
                     throw new InvalidMoveException("ERROR: CURRENTLY IN CHECK");
@@ -140,12 +140,12 @@ public class ChessGame implements Cloneable {
             } else {
                 // Alternate board to see if the move will put us in check
                 ChessGame altGame = this.clone();
-                altGame.chessBoard.addPiece(endPos, currPiece);
-                altGame.chessBoard.addPiece(startPos, null);
+                altGame.chessBoard.addPiece(endPosition, currentPiece);
+                altGame.chessBoard.addPiece(startPosition, null);
                 if (altGame.isInCheck(getTeamTurn())) {
                     throw new InvalidMoveException("ERROR: MOVE WILL PUT YOU INTO CHECK");
                 } else {
-                    isPromotingPawn(currPiece, promoPiece, startPos, endPos);
+                    isPromotingPawn(currentPiece, promoPiece, startPosition, endPosition);
                 }
             }
 
@@ -153,18 +153,18 @@ public class ChessGame implements Cloneable {
             throw new InvalidMoveException("ERROR: WRONG TURN");
         }
         // Change turn to the other team
-        currentTurn = currPiece.getTeamColor() == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
+        currentTurn = currentPiece.getTeamColor() == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
     }
 
     // Promoting Pawn Helper
-    public void isPromotingPawn(ChessPiece currPiece, ChessPiece.PieceType promoPiece, ChessPosition startPos, ChessPosition endPos){
+    public void isPromotingPawn(ChessPiece currentPiece, ChessPiece.PieceType promoPiece, ChessPosition startPosition, ChessPosition endPosition){
         if (promoPiece != null) {
             ChessPiece promotedPiece = new ChessPiece(currentTurn, promoPiece);
-            this.chessBoard.addPiece(endPos, promotedPiece);
-            this.chessBoard.addPiece(startPos, null);
+            this.chessBoard.addPiece(endPosition, promotedPiece);
+            this.chessBoard.addPiece(startPosition, null);
         } else {
-            this.chessBoard.addPiece(endPos, currPiece);
-            this.chessBoard.addPiece(startPos, null);
+            this.chessBoard.addPiece(endPosition, currentPiece);
+            this.chessBoard.addPiece(startPosition, null);
         }
     }
 
@@ -225,13 +225,13 @@ public class ChessGame implements Cloneable {
 
                 for (ChessMove move : friendlyMoves) {
                     // Will this move take us out of check?
-                    ChessPosition endPos = move.getEndPosition();
-                    ChessPosition startPos = move.getStartPosition();
+                    ChessPosition endPosition = move.getEndPosition();
+                    ChessPosition startPosition = move.getStartPosition();
 
                     // Create alternate universe game to see if move will take us out of check
                     ChessGame altGame = this.clone();
-                    altGame.chessBoard.addPiece(endPos, friendlyPiece);
-                    altGame.chessBoard.addPiece(startPos, null);
+                    altGame.chessBoard.addPiece(endPosition, friendlyPiece);
+                    altGame.chessBoard.addPiece(startPosition, null);
 
                     // If all moves keep us in check, we're in checkmate
                     if (!altGame.isInCheck(teamColor)) {
@@ -266,14 +266,14 @@ public class ChessGame implements Cloneable {
                     Collection<ChessMove> friendlyMoves = friendlyPiece.pieceMoves(this.chessBoard, friendlyPosition);
                     for (ChessMove move : friendlyMoves) {
                         // Will this move put us into check?
-                        ChessPosition endPos = move.getEndPosition();
-                        ChessPosition startPos = move.getStartPosition();
+                        ChessPosition endPosition = move.getEndPosition();
+                        ChessPosition startPosition = move.getStartPosition();
 
-                        if (this.chessBoard.getPiece(endPos) == null || (this.chessBoard.getPiece(endPos) != null && this.chessBoard.getPiece(endPos).getTeamColor() != currentTurn)) {
+                        if (this.chessBoard.getPiece(endPosition) == null || (this.chessBoard.getPiece(endPosition) != null && this.chessBoard.getPiece(endPosition).getTeamColor() != currentTurn)) {
                             // Create alternate universe game to see if move will put us into check
                             ChessGame altGame = this.clone();
-                            altGame.chessBoard.addPiece(endPos, friendlyPiece);
-                            altGame.chessBoard.addPiece(startPos, null);
+                            altGame.chessBoard.addPiece(endPosition, friendlyPiece);
+                            altGame.chessBoard.addPiece(startPosition, null);
 
                             // If all moves keep us in check, we're in checkmate
                             if (altGame.isInCheck(teamColor)) {
