@@ -38,7 +38,7 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        ChessPiece currPiece = chessBoard.getPiece(startPosition);
+        ChessPiece currentPiece = chessBoard.getPiece(startPosition);
 
         return new HashSet<>();
     }
