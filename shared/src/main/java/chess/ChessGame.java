@@ -257,8 +257,8 @@ public class ChessGame implements Cloneable {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        boolean inStalemate = true;
 
+    if(isInCheck(teamColor)) return false;
         for (int i = 1; i < 9; i++) {
             for (int j = 1; j < 9; j++) {
                 ChessPosition friendlyPosition = new ChessPosition(i, j);
@@ -288,8 +288,7 @@ public class ChessGame implements Cloneable {
             }
         }
 
-
-        return inStalemate;
+        return true;
     }
 
     /**
