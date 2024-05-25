@@ -1,5 +1,3 @@
-package passoffTests.serverTests;
-
 import chess.ChessGame;
 import org.junit.jupiter.api.*;
 import passoffTests.obfuscatedTestClasses.TestServerFacade;

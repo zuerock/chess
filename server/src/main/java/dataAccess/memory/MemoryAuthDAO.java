@@ -5,10 +5,10 @@ import model.AuthData;
 
 import java.util.UUID;
 
-public class AuthMemDAO implements AuthDAO {
+public class MemoryAuthDAO implements AuthDAO {
     private Database database;
 
-    public AuthMemDAO(Database database) {
+    public MemoryAuthDAO(Database database) {
         this.database = database;
     }
 

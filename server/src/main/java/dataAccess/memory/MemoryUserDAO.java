@@ -3,10 +3,10 @@ import dataAccess.DataAccessException;
 import dataAccess.UserDAO;
 import model.UserData;
 
-public class UserMemDAO implements UserDAO {
+public class MemoryUserDAO implements UserDAO {
     private Database database;
 
-    public UserMemDAO(Database database) {
+    public MemoryUserDAO(Database database) {
         this.database = database;
     }
 

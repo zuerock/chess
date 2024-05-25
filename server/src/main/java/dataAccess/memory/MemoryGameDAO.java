@@ -2,16 +2,15 @@ package dataAccess.memory;
 import chess.ChessGame;
 import dataAccess.DataAccessException;
 import dataAccess.GameDAO;
-import jdk.jshell.spi.ExecutionControl;
 import model.GameData;
 import responses.GameResponse;
 
 import java.util.*;
 
-public class GameMemDAO implements GameDAO {
+public class MemoryGameDAO implements GameDAO {
     private Database database;
 
-    public GameMemDAO(Database database) {
+    public MemoryGameDAO(Database database) {
         this.database = database;
     }
 
