@@ -1,34 +1,35 @@
 package service;
 
-import dataAccess.*;
-import requests.BaseRequest;
-import responses.BaseResponse;
-import service.exceptions.UnauthorizedException;
+import dataAccess.DataAccessException;
+import dataAccess.interfaces.AuthDao;
+import dataAccess.sql.*;
+import model.AuthData;
+import request.LogoutRequest;
+import result.Result;
 
 public class LogoutService {
-    private UserDAO userDAO;
-    private GameDAO gameDAO;
-    private AuthDAO authDAO;
+    private static LogoutService instance;
 
-    public LogoutService(UserDAO userDAO, GameDAO gameDAO, AuthDAO authDAO) {
-        this.userDAO = userDAO;
-        this.gameDAO = gameDAO;
-        this.authDAO = authDAO;
-    }
-    public BaseResponse logout(BaseRequest request, String authToken) throws UnauthorizedException, DataAccessException {
-        try {
-            String verifiedAuthToken = authDAO.getAuth(authToken);
+    private LogoutService() {}
 
-            if (verifiedAuthToken != null) {
-                authDAO.deleteAuth(authToken);
-                return new BaseResponse();
-
-            } else {
-                throw new UnauthorizedException("Error: unauthorized");
-            }
-
-        } catch (DataAccessException e) {
-            throw new DataAccessException("Error: " + e.getMessage());
+    public static LogoutService getInstance() {
+        if (instance == null) {
+            instance = new LogoutService();
         }
+        return instance;
+    }
+
+    public Result logout(LogoutRequest request) throws DataAccessException {
+        AuthDao authDao = SQLAuthDao.getInstance();
+        String authToken = request.authToken();
+        AuthData authData = new AuthData(authToken, null);
+        authData = authDao.getUser(authData);
+        if(authData == null) {
+            return new Result("Error: unauthorized");
+        }
+
+        authDao.deleteAuth(authData);
+
+        return new Result(null);
     }
 }

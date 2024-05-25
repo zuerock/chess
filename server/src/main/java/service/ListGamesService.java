@@ -1,37 +1,40 @@
 package service;
 
-import dataAccess.*;
-import requests.BaseRequest;
-import responses.GameResponse;
-import responses.ListGamesResponse;
-import service.exceptions.UnauthorizedException;
+import dataAccess.DataAccessException;
+import dataAccess.interfaces.AuthDao;
+import dataAccess.interfaces.GameDao;
+import dataAccess.sql.*;
+import model.AuthData;
+import model.GameData;
+import request.ListGamesRequest;
+import result.GameListResult;
 
-import java.util.List;
+import java.util.Set;
 
 public class ListGamesService {
-    private UserDAO userDAO;
-    private GameDAO gameDAO;
-    private AuthDAO authDAO;
+    private static ListGamesService instance;
 
-    public ListGamesService(UserDAO userDAO, GameDAO gameDAO, AuthDAO authDAO) {
-        this.userDAO = userDAO;
-        this.gameDAO = gameDAO;
-        this.authDAO = authDAO;
-    }
-    public ListGamesResponse listGames(BaseRequest request, String authToken) throws UnauthorizedException, DataAccessException {
-        try {
-            String verifiedAuthToken = authDAO.getAuth(authToken);
-            if (verifiedAuthToken != null) {
+    private ListGamesService() {}
 
-                List<GameResponse> gamesList = gameDAO.listGames();
-                return new ListGamesResponse(gamesList);
-
-            } else {
-                throw new UnauthorizedException("Error: unauthorized");
-            }
-
-        } catch (DataAccessException e) {
-            throw new DataAccessException("Error: " + e.getMessage());
+    public static ListGamesService getInstance() {
+        if (instance == null) {
+            instance = new ListGamesService();
         }
+        return instance;
+    }
+
+    public GameListResult listGames(ListGamesRequest request) throws DataAccessException {
+        AuthDao authDao = SQLAuthDao.getInstance();
+        String authToken = request.authToken();
+        AuthData authData = new AuthData(authToken, null);
+        authData = authDao.getUser(authData);
+        if(authData == null) {
+            return new GameListResult(null, "Error: unauthorized");
+        }
+
+        GameDao gameDao = SQLGameDao.getInstance();
+        Set<GameData> games = gameDao.listGames();
+
+        return new GameListResult(games, null);
     }
 }

@@ -1,37 +1,45 @@
 package service;
 
-import dataAccess.*;
-import requests.LoginRequest;
-import responses.AuthResponse;
-import service.exceptions.UnauthorizedException;
+import dataAccess.DataAccessException;
+import dataAccess.interfaces.AuthDao;
+import dataAccess.interfaces.UserDao;
+import dataAccess.sql.*;
+import model.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import request.LoginRequest;
+import result.AuthResult;
+
+import java.util.UUID;
 
 public class LoginService {
-    private UserDAO userDAO;
-    private GameDAO gameDAO;
-    private AuthDAO authDAO;
+    private static LoginService instance;
 
-    public LoginService(UserDAO userDAO, GameDAO gameDAO, AuthDAO authDAO) {
-        this.userDAO = userDAO;
-        this.gameDAO = gameDAO;
-        this.authDAO = authDAO;
-    }
-    public AuthResponse login(LoginRequest request) throws UnauthorizedException, DataAccessException {
-        String username = request.getUsername();
-        String password = request.getPassword();
+    private LoginService() {}
 
-        try {
-            String[] userData = userDAO.getUser(username, password);
-
-            if (userData != null) {
-                String authToken = authDAO.createAuth(username);
-                return new AuthResponse(username, authToken);
-
-            } else {
-                throw new UnauthorizedException("Error: unauthorized");
-            }
-
-        } catch (DataAccessException e) {
-            throw new DataAccessException("Error: " + e.getMessage());
+    public static LoginService getInstance() {
+        if (instance == null) {
+            instance = new LoginService();
         }
+        return instance;
+    }
+
+    public AuthResult login(LoginRequest request) throws DataAccessException {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        UserDao userDao = SQLUserDao.getInstance();
+        String username = request.username();
+        String password = request.password();
+        UserData userData = new UserData(username, password, null);
+
+        if(userDao.getUser(userData) == null || !encoder.matches(password, userDao.getUser(userData).password())) {
+            return new AuthResult(null, null, "Error: unauthorized");
+        }
+
+        AuthDao authDao = SQLAuthDao.getInstance();
+        String authToken = UUID.randomUUID().toString();
+        AuthData authData = new AuthData(authToken, username);
+
+        authDao.createAuth(authData);
+
+        return new AuthResult(username, authToken, null);
     }
 }

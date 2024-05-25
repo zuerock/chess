@@ -10,36 +10,20 @@ import java.util.Objects;
  */
 public class ChessPosition {
 
-    private final int row;
-    private final int col;
+    private int row;
+    private int col;
 
     public ChessPosition(int row, int col) {
         this.row = row;
         this.col = col;
     }
 
-    /**
-     * @return which row this position is in
-     * 1 codes for the bottom row
-     */
-    public int getRow() {
-        return this.row;
-    }
-
-    /**
-     * @return which column this position is in
-     * 1 codes for the left row
-     */
-    public int getColumn() {
-        return this.col;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ChessPosition position = (ChessPosition) o;
-        return row == position.row && col == position.col;
+        ChessPosition that = (ChessPosition) o;
+        return row == that.row && col == that.col;
     }
 
     @Override
@@ -49,8 +33,25 @@ public class ChessPosition {
 
     @Override
     public String toString() {
-        return "(" + row +
-                ", " + col +
-                ")";
+        return "ChessPosition{" +
+                "row=" + row +
+                ", col=" + col +
+                '}';
+    }
+
+    /**
+     * @return which row this position is in
+     * 1 codes for the bottom row
+     */
+    public int getRow() {
+        return row;
+    }
+
+    /**
+     * @return which column this position is in
+     * 1 codes for the left row
+     */
+    public int getColumn() {
+        return col;
     }
 }

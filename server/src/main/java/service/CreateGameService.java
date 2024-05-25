@@ -1,45 +1,55 @@
 package service;
 
-import dataAccess.*;
-import requests.CreateGameRequest;
-import responses.CreateGameResponse;
-import service.exceptions.BadRequestException;
-import service.exceptions.UnauthorizedException;
+import chess.ChessGame;
+import dataAccess.DataAccessException;
+import dataAccess.interfaces.AuthDao;
+import dataAccess.interfaces.GameDao;
+import dataAccess.sql.*;
+import model.*;
+import request.CreateGameRequest;
+import result.GameResult;
+
+import java.util.Random;
 
 public class CreateGameService {
-    private UserDAO userDAO;
-    private GameDAO gameDAO;
-    private AuthDAO authDAO;
+    private static CreateGameService instance;
 
-    public CreateGameService(UserDAO userDAO, GameDAO gameDAO, AuthDAO authDAO) {
-        this.userDAO = userDAO;
-        this.gameDAO = gameDAO;
-        this.authDAO = authDAO;
+    private CreateGameService() {}
+
+    public static CreateGameService getInstance() {
+        if (instance == null) {
+            instance = new CreateGameService();
+        }
+        return instance;
     }
-    public CreateGameResponse createGame(CreateGameRequest request, String authToken) throws BadRequestException, UnauthorizedException, DataAccessException {
-        String gameName = request.getGameName();
 
-        if (gameName == null) {
-            throw new BadRequestException("Error: bad request");
+    public GameResult createGame(CreateGameRequest request) throws DataAccessException {
+        if (request.gameName() == null) {
+            return new GameResult(null, null, null, null,
+                    "Error: bad request");
+        }
+        AuthDao authDao = SQLAuthDao.getInstance();
+        String authToken = request.authToken();
+        AuthData authData = new AuthData(authToken, null);
+        authData = authDao.getUser(authData);
+        if(authData == null) {
+            return new GameResult(null, null, null, null,
+                    "Error: unauthorized");
         }
 
-        try {
-            String verifiedAuthToken = authDAO.getAuth(authToken);
+        GameDao gameDao = SQLGameDao.getInstance();
 
-            if (verifiedAuthToken != null) {
-                if (gameDAO.getGame(gameName) == null){
-                    int gameID = gameDAO.createGame(gameName);
-                    return new CreateGameResponse(gameID);
+        String gameName = request.gameName();
+        GameData gameData;
+        do { //this method is only effective if a few games are being played, and maxes out at 9000 total games
+            Random random = new Random();
+            int gameID = random.nextInt(1000, 10000);
+            gameData = new GameData(gameID, null, null, gameName, new ChessGame());
+        } while(gameDao.getGame(gameData) != null);
 
-                }else{
-                    throw new BadRequestException("Error: bad request");
-                }
-            } else {
-                throw new UnauthorizedException("Error: unauthorized");
-            }
+        gameDao.createGame(gameData);
 
-        } catch (DataAccessException e) {
-            throw new DataAccessException("Error: " + e.getMessage());
-        }
+        return new GameResult(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(),
+                gameData.gameName(), null);
     }
 }
