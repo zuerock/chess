@@ -1,51 +1,23 @@
 package handler;
 
-import jsonConverter.JsonConverter;
+import com.google.gson.Gson;
+import dataAccess.AuthDAO;
+import dataAccess.GameDAO;
 import request.JoinGameRequest;
-import result.Result;
-import service.JoinGameService;
-import spark.*;
+import response.JoinGameResponse;
+import service.GameService;
+import spark.Request;
+import spark.Response;
 
-public class JoinGameHandler implements Handler {
-    private static JoinGameHandler instance;
+public class JoinGameHandler {
 
-    private JoinGameHandler() {}
-
-    public static JoinGameHandler getInstance() {
-        if (instance == null) {
-            instance = new JoinGameHandler();
-        }
-        return instance;
-    }
-
-    @Override
-    public Object handle(Request req, Response res) {
-        JsonConverter converter = JsonConverter.getInstance();
-        JoinGameRequest request = converter.fromJson(req.body(), JoinGameRequest.class);
-        String authToken = req.headers("authorization");
-        request = new JoinGameRequest(request.playerColor(), request.gameID(), authToken);
-        JoinGameService service = JoinGameService.getInstance();
-        try {
-            Result result = service.joinGame(request);
-            if (result.message() != null) {
-                if (result.message().equals("Error: bad request")) {
-                    res.status(400);
-                }
-                else if (result.message().equals("Error: unauthorized")) {
-                    res.status(401);
-                } else if (result.message().equals("Error: already taken")) {
-                    res.status(403);
-                } else {
-                    res.status(500);
-                }
-            } else {
-                res.status(200);
-            }
-            return converter.toJson(result);
-        }
-        catch (Exception e) {
-            res.status(500);
-            return converter.toJson(new Result("Error: "+e.toString()));
-        }
+    public Object handle(Request request, Response response, AuthDAO authObj, GameDAO gameObj){
+        Gson myGson = new Gson();
+        JoinGameRequest myRequest = myGson.fromJson(request.body(), JoinGameRequest.class);
+        String authToken = request.headers("authorization");
+        GameService myGameService = new GameService();
+        JoinGameResponse myJoinGameResponse = myGameService.joinGameRespond(myRequest, authToken, authObj, gameObj);
+        response.status(myJoinGameResponse.status);
+        return myGson.toJson(myJoinGameResponse);
     }
 }

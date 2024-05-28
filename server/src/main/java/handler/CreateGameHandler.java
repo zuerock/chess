@@ -1,51 +1,23 @@
 package handler;
 
-import jsonConverter.JsonConverter;
+import com.google.gson.Gson;
+import dataAccess.AuthDAO;
+import dataAccess.GameDAO;
 import request.CreateGameRequest;
-import result.GameResult;
-import service.CreateGameService;
+import response.CreateGameResponse;
+import service.GameService;
 import spark.Request;
 import spark.Response;
 
-public class CreateGameHandler implements Handler {
-    private static CreateGameHandler instance;
+public class CreateGameHandler {
 
-    private CreateGameHandler() {}
-
-    public static CreateGameHandler getInstance() {
-        if (instance == null) {
-            instance = new CreateGameHandler();
-        }
-        return instance;
-    }
-
-    @Override
-    public Object handle(Request req, Response res) {
-        JsonConverter converter = JsonConverter.getInstance();
-        CreateGameRequest request = converter.fromJson(req.body(), CreateGameRequest.class);
-        String authToken = req.headers("authorization");
-        request = new CreateGameRequest(request.gameName(), authToken);
-        CreateGameService service = CreateGameService.getInstance();
-        try {
-            GameResult result = service.createGame(request);
-            if (result.message() != null) {
-                if (result.message().equals("Error: bad request")) {
-                    res.status(400);
-                }
-                else if (result.message().equals("Error: unauthorized")) {
-                    res.status(401);
-                } else {
-                    res.status(500);
-                }
-            } else {
-                res.status(200);
-            }
-            return converter.toJson(result);
-        }
-        catch (Exception e) {
-            res.status(500);
-            return converter.toJson(new GameResult(null, null, null, null,
-                    "Error: "+e.toString()));
-        }
+    public Object handle(Request request, Response response, AuthDAO authObj, GameDAO gameObj){
+        Gson myGson = new Gson();
+        CreateGameRequest myRequest = myGson.fromJson(request.body(), CreateGameRequest.class);
+        String authToken = request.headers("authorization");
+        GameService myGameService = new GameService();
+        CreateGameResponse myCreateGameResponse = myGameService.createGameRespond(myRequest, authToken, authObj, gameObj);
+        response.status(myCreateGameResponse.status);
+        return myGson.toJson(myCreateGameResponse);
     }
 }

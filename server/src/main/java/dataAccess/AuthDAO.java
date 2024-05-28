@@ -1,9 +1,19 @@
 package dataAccess;
 
-public interface AuthDAO {
-    String createAuth(String username) throws DataAccessException;
-    String getAuth(String authToken) throws DataAccessException;
-    String getUsername(String authToken) throws DataAccessException;
-    void deleteAuth (String authToken) throws DataAccessException;
-    void clear () throws DataAccessException;
+import model.AuthData;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class AuthDAO {
+
+    public List<AuthData> authList = new ArrayList<>();
+
+    public void createAuth(AuthData auth){
+        authList.add(auth);
+    }
+
+    public void clearAuthList(){
+        authList.clear();
+    }
 }

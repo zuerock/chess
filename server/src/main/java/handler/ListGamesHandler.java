@@ -1,45 +1,21 @@
 package handler;
 
-import jsonConverter.JsonConverter;
-import request.ListGamesRequest;
-import result.GameListResult;
-import service.ListGamesService;
-import spark.*;
+import com.google.gson.Gson;
+import dataAccess.AuthDAO;
+import dataAccess.GameDAO;
+import response.ListGamesResponse;
+import service.GameService;
+import spark.Request;
+import spark.Response;
 
-public class ListGamesHandler implements Handler {
-    private static ListGamesHandler instance;
+public class ListGamesHandler {
 
-    private ListGamesHandler() {}
-
-    public static ListGamesHandler getInstance() {
-        if (instance == null) {
-            instance = new ListGamesHandler();
-        }
-        return instance;
-    }
-
-    @Override
-    public Object handle(Request req, Response res) {
-        JsonConverter converter = JsonConverter.getInstance();
-        String authToken = req.headers("authorization");
-        ListGamesRequest request = new ListGamesRequest(authToken);
-        ListGamesService service = ListGamesService.getInstance();
-        try {
-            GameListResult result = service.listGames(request);
-            if (result.message() != null) {
-                if (result.message().equals("Error: unauthorized")) {
-                    res.status(401);
-                } else {
-                    res.status(500);
-                }
-            } else {
-                res.status(200);
-            }
-            return converter.toJson(result);
-        }
-        catch (Exception e) {
-            res.status(500);
-            return converter.toJson(new GameListResult(null, "Error: "+e.toString()));
-        }
+    public Object handle(Request request, Response response, AuthDAO authObj, GameDAO gameObj){
+        Gson myGson = new Gson();
+        String authToken = request.headers("authorization");
+        GameService myGameService = new GameService();
+        ListGamesResponse myListGamesResponse = myGameService.listGamesRespond(authToken, authObj, gameObj);
+        response.status(myListGamesResponse.status);
+        return myGson.toJson(myListGamesResponse);
     }
 }

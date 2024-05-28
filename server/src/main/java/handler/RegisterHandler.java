@@ -1,46 +1,21 @@
 package handler;
 
-import jsonConverter.JsonConverter;
+import com.google.gson.Gson;
+import dataAccess.AuthDAO;
+import dataAccess.UserDAO;
 import request.RegisterRequest;
-import service.RegisterService;
-import result.AuthResult;
-import spark.*;
+import response.RegisterResponse;
+import service.UserService;
+import spark.Request;
+import spark.Response;
 
-public class RegisterHandler implements Handler {
-    private static RegisterHandler instance;
-
-    private RegisterHandler() {}
-
-    public static RegisterHandler getInstance() {
-        if (instance == null) {
-            instance = new RegisterHandler();
-        }
-        return instance;
-    }
-
-    @Override
-    public Object handle(Request req, Response res) {
-        JsonConverter converter = JsonConverter.getInstance();
-        RegisterRequest request = converter.fromJson(req.body(), RegisterRequest.class);
-        RegisterService service = RegisterService.getInstance();
-        try {
-            AuthResult result = service.register(request);
-            if (result.message() != null) {
-                if (result.message().equals("Error: bad request")) {
-                    res.status(400);
-                } else if (result.message().equals("Error: already taken")) {
-                    res.status(403);
-                } else {
-                    res.status(500);
-                }
-            } else {
-                res.status(200);
-            }
-            return converter.toJson(result);
-        }
-        catch (Exception e) {
-            res.status(500);
-            return converter.toJson(new AuthResult(null, null, "Error: "+e.toString()));
-        }
+public class RegisterHandler {
+    public Object handle (Request request, Response response, UserDAO userObj, AuthDAO authObj){
+        Gson myGson = new Gson();
+        RegisterRequest myRequest = myGson.fromJson(request.body(), RegisterRequest.class);
+        UserService myUserService = new UserService();
+        RegisterResponse myRegResponse = myUserService.regRespond(myRequest, userObj, authObj);
+        response.status(myRegResponse.status);
+        return myGson.toJson(myRegResponse);
     }
 }

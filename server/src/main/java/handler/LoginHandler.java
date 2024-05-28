@@ -1,44 +1,22 @@
 package handler;
 
-import jsonConverter.JsonConverter;
+import com.google.gson.Gson;
+import dataAccess.AuthDAO;
+import dataAccess.UserDAO;
 import request.LoginRequest;
-import result.AuthResult;
-import service.LoginService;
-import spark.*;
+import response.LoginResponse;
+import service.UserService;
+import spark.Request;
+import spark.Response;
 
-public class LoginHandler implements Handler {
-    private static LoginHandler instance;
+public class LoginHandler {
 
-    private LoginHandler() {}
-
-    public static LoginHandler getInstance() {
-        if (instance == null) {
-            instance = new LoginHandler();
-        }
-        return instance;
-    }
-
-    @Override
-    public Object handle(Request req, Response res) {
-        JsonConverter converter = JsonConverter.getInstance();
-        LoginRequest request = converter.fromJson(req.body(), LoginRequest.class);
-        LoginService service = LoginService.getInstance();
-        try {
-            AuthResult result = service.login(request);
-            if (result.message() != null) {
-                if (result.message().equals("Error: unauthorized")) {
-                    res.status(401);
-                } else {
-                    res.status(500);
-                }
-            } else {
-                res.status(200);
-            }
-            return converter.toJson(result);
-        }
-        catch (Exception e) {
-            res.status(500);
-            return converter.toJson(new AuthResult(null, null, "Error: "+e.toString()));
-        }
+    public Object handle(Request request, Response response, UserDAO userObj, AuthDAO authObj) {
+        Gson myGson = new Gson();
+        LoginRequest myRequest = myGson.fromJson(request.body(), LoginRequest.class);
+        UserService myUserService = new UserService();
+        LoginResponse myLoginResponse = myUserService.loginRespond(myRequest, userObj, authObj);
+        response.status(myLoginResponse.status);
+        return myGson.toJson(myLoginResponse);
     }
 }

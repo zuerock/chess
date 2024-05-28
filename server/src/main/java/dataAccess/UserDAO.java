@@ -1,8 +1,16 @@
 package dataAccess;
 
-public interface UserDAO {
-    void createUser(String username, String password, String email) throws DataAccessException;
-    String getUser(String username) throws DataAccessException;
-    String[] getUser(String username, String password) throws DataAccessException;
-    void clear () throws DataAccessException;
+import java.util.ArrayList;
+import java.util.List;
+
+import model.UserData;
+public class UserDAO {
+    public List<UserData> userList = new ArrayList<>();
+    public void createUser(UserData newUser){
+        userList.add(newUser);
+    }
+
+    public void clearUserList(){
+        userList.clear();
+    }
 }
