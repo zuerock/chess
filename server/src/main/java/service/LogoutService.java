@@ -2,7 +2,7 @@ package service;
 
 import dataAccess.DataAccessException;
 import dataAccess.interfaces.AuthDao;
-import dataAccess.sql.*;
+import dataAccess.memory.MemoryAuthDao;
 import model.AuthData;
 import request.LogoutRequest;
 import result.Result;
@@ -20,7 +20,7 @@ public class LogoutService {
     }
 
     public Result logout(LogoutRequest request) throws DataAccessException {
-        AuthDao authDao = SQLAuthDao.getInstance();
+        AuthDao authDao = MemoryAuthDao.getInstance();
         String authToken = request.authToken();
         AuthData authData = new AuthData(authToken, null);
         authData = authDao.getUser(authData);

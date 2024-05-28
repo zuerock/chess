@@ -4,7 +4,9 @@ import dataAccess.DataAccessException;
 import dataAccess.interfaces.AuthDao;
 import dataAccess.interfaces.GameDao;
 import dataAccess.interfaces.UserDao;
-import dataAccess.sql.*;
+import dataAccess.memory.MemoryAuthDao;
+import dataAccess.memory.MemoryGameDao;
+import dataAccess.memory.MemoryUserDao;
 import result.Result;
 
 public class ClearService {
@@ -20,9 +22,9 @@ public class ClearService {
     }
 
     public Result clear() throws DataAccessException {
-        UserDao userDao = SQLUserDao.getInstance();
-        GameDao gameDao = SQLGameDao.getInstance();
-        AuthDao authDao = SQLAuthDao.getInstance();
+        UserDao userDao = MemoryUserDao.getInstance();
+        GameDao gameDao = MemoryGameDao.getInstance();
+        AuthDao authDao = MemoryAuthDao.getInstance();
         authDao.clear();
         gameDao.clear();
         userDao.clear();

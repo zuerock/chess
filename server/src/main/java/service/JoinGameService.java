@@ -4,7 +4,8 @@ import chess.ChessGame;
 import dataAccess.DataAccessException;
 import dataAccess.interfaces.AuthDao;
 import dataAccess.interfaces.GameDao;
-import dataAccess.sql.*;
+import dataAccess.memory.MemoryAuthDao;
+import dataAccess.memory.MemoryGameDao;
 import model.AuthData;
 import model.GameData;
 import request.JoinGameRequest;
@@ -33,7 +34,7 @@ public class JoinGameService {
             }
         }
 
-        AuthDao authDao = SQLAuthDao.getInstance();
+        AuthDao authDao = MemoryAuthDao.getInstance();
         String authToken = request.authToken();
         AuthData authData = new AuthData(authToken, null);
         authData = authDao.getUser(authData);
@@ -41,7 +42,7 @@ public class JoinGameService {
             return new Result("Error: unauthorized");
         }
 
-        GameDao gameDao = SQLGameDao.getInstance();
+        GameDao gameDao = MemoryGameDao.getInstance();
         GameData gameData = new GameData(request.gameID(), null, null, null, null);
         gameData = gameDao.getGame(gameData);
         if (gameData == null) {

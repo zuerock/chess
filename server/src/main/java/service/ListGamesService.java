@@ -3,7 +3,8 @@ package service;
 import dataAccess.DataAccessException;
 import dataAccess.interfaces.AuthDao;
 import dataAccess.interfaces.GameDao;
-import dataAccess.sql.*;
+import dataAccess.memory.MemoryAuthDao;
+import dataAccess.memory.MemoryGameDao;
 import model.AuthData;
 import model.GameData;
 import request.ListGamesRequest;
@@ -24,7 +25,7 @@ public class ListGamesService {
     }
 
     public GameListResult listGames(ListGamesRequest request) throws DataAccessException {
-        AuthDao authDao = SQLAuthDao.getInstance();
+        AuthDao authDao = MemoryAuthDao.getInstance();
         String authToken = request.authToken();
         AuthData authData = new AuthData(authToken, null);
         authData = authDao.getUser(authData);
@@ -32,7 +33,7 @@ public class ListGamesService {
             return new GameListResult(null, "Error: unauthorized");
         }
 
-        GameDao gameDao = SQLGameDao.getInstance();
+        GameDao gameDao = MemoryGameDao.getInstance();
         Set<GameData> games = gameDao.listGames();
 
         return new GameListResult(games, null);

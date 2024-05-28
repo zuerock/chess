@@ -3,7 +3,8 @@ package service;
 import dataAccess.DataAccessException;
 import dataAccess.interfaces.AuthDao;
 import dataAccess.interfaces.UserDao;
-import dataAccess.sql.*;
+import dataAccess.memory.MemoryAuthDao;
+import dataAccess.memory.MemoryUserDao;
 import model.AuthData;
 import model.UserData;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -26,7 +27,7 @@ public class RegisterService {
 
     public AuthResult register(RegisterRequest request) throws DataAccessException {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        UserDao userDao = SQLUserDao.getInstance();
+        UserDao userDao = MemoryUserDao.getInstance();
         String username = request.username();
         String password = request.password();
         String email = request.email();
@@ -41,7 +42,7 @@ public class RegisterService {
         }
         userDao.createUser(userData);
 
-        AuthDao authDao = SQLAuthDao.getInstance();
+        AuthDao authDao = MemoryAuthDao.getInstance();
         String authToken = UUID.randomUUID().toString();
         AuthData authData = new AuthData(authToken, username);
 
