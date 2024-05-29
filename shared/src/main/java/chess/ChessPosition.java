@@ -1,7 +1,5 @@
 package chess;
 
-import java.util.Objects;
-
 /**
  * Represents a single square position on a chess board
  * <p>
@@ -10,11 +8,12 @@ import java.util.Objects;
  */
 public class ChessPosition {
 
-    private final int row;
-    private final int col;
+    private int row;
+    private int col;
+
     public ChessPosition(int row, int col) {
-        this.row = row;
-        this.col = col;
+        this.row = row - 1; // Subtract 1 to convert from 1-based to 0-based index
+        this.col = col - 1; // Subtract 1 to convert from 1-based to 0-based index
     }
 
     /**
@@ -22,7 +21,7 @@ public class ChessPosition {
      * 1 codes for the bottom row
      */
     public int getRow() {
-        return this.row;
+        return this.row; // Add 1 to convert back to 1-based index
     }
 
     /**
@@ -30,26 +29,30 @@ public class ChessPosition {
      * 1 codes for the left row
      */
     public int getColumn() {
-        return this.col;
+        return this.col; // Add 1 to convert back to 1-based index
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ChessPosition position = (ChessPosition) o;
-        return row == position.row && col == position.col;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(row, col);
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || this.getClass() != obj.getClass()) {
+            return false;
+        }
+        ChessPosition other = (ChessPosition) obj;
+        return this.row == other.row && this.col == other.col;
     }
 
     @Override
     public String toString() {
-        return "(" + row +
-                ", " + col +
-                ")";
+        return "(" + this.row + ", " + this.col + ")";
+    }
+
+    @Override
+    public int hashCode() {
+        int result = row;
+        result = 31 * result + col;
+        return result;
     }
 }
