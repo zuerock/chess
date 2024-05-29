@@ -8,6 +8,3 @@ out/
 
 ### Mac OS ###
 .DS_Store
-
-### Chess project ###
-server/**/db.properties
