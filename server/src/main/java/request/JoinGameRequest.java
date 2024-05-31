@@ -7,6 +7,9 @@ public class JoinGameRequest {
     public JoinGameRequest(String playerColor, int gameID) {
         this.playerColor = playerColor;
         this.gameID = gameID;
+        if(playerColor == null) {
+            this.gameID = 0;
+        }
     }
 
     public String getPlayerColor() {

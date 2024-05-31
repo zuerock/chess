@@ -1,19 +1,19 @@
 package service;
 
-import dataAccess.AuthDAO;
-import dataAccess.UserDAO;
+import dataaccess.AuthDAO;
+import dataaccess.UserDAO;
 import model.AuthData;
 import model.UserData;
 import request.LoginRequest;
 import request.RegisterRequest;
-import response.LoginResponse;
-import response.LogoutResponse;
-import response.RegisterResponse;
+import result.LoginResult;
+import result.LogoutResult;
+import result.RegisterResult;
 
 import java.util.UUID;
 
 public class UserService {
-    public RegisterResponse regRespond(RegisterRequest req, UserDAO userObj, AuthDAO authObj) {
+    public RegisterResult regResult(RegisterRequest req, UserDAO userObj, AuthDAO authObj) {
         String username = null;
         String authToken = null;
         String message = "";
@@ -24,7 +24,7 @@ public class UserService {
             authToken = null;
             message = "ERROR - Bad request";
             status = 400;
-            return new RegisterResponse(username, authToken, message, status);
+            return new RegisterResult(username, authToken, message, status);
         }
 
         for (int i = 0; i < userObj.userList.size(); i = i + 1) {
@@ -33,7 +33,7 @@ public class UserService {
                 authToken = null;
                 message = "ERROR - User already exists";
                 status = 403;
-                return new RegisterResponse(username, authToken, message, status);
+                return new RegisterResult(username, authToken, message, status);
             }
         }
 
@@ -44,10 +44,10 @@ public class UserService {
         authObj.createAuth(authDataToAdd);
         authToken = authDataToAdd.authToken();
 
-        return new RegisterResponse(username, authToken, message, status);
+        return new RegisterResult(username, authToken, message, status);
     }
 
-    public LoginResponse loginRespond(LoginRequest req, UserDAO userObj, AuthDAO authObj) {
+    public LoginResult loginResult(LoginRequest req, UserDAO userObj, AuthDAO authObj) {
         String username = req.getUsername();
         String authToken = "";
 
@@ -55,24 +55,24 @@ public class UserService {
             if (userObj.userList.get(i).username().equals(req.getUsername()) && req.password.equals(userObj.userList.get(i).password())) {
                 authToken = UUID.randomUUID().toString();
                 authObj.authList.add(new AuthData(authToken, username));
-                return new LoginResponse(username, authToken, "", 200);
+                return new LoginResult(username, authToken, "", 200);
             }
             else {
-                return new LoginResponse(null, null, "ERROR - Unauthorized", 401);
+                return new LoginResult(null, null, "ERROR - Unauthorized", 401);
             }
         }
 
-        return new LoginResponse(null, null, "ERROR - User does not exist", 401);
+        return new LoginResult(null, null, "ERROR - User does not exist", 401);
     }
 
-    public LogoutResponse logoutRespond(String authToken, AuthDAO authObj) {
+    public LogoutResult logoutResult(String authToken, AuthDAO authObj) {
         for (int i = 0; i < authObj.authList.size(); i = i + 1) {
             if (authToken.equals(authObj.authList.get(i).authToken())) {
                 authObj.authList.remove(i);
-                return new LogoutResponse(null, 200);
+                return new LogoutResult(null, 200);
             }
         }
 
-        return new LogoutResponse("ERROR - Unauthorized", 401);
+        return new LogoutResult("ERROR - Unauthorized", 401);
     }
 }

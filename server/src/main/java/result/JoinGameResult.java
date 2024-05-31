@@ -1,10 +1,10 @@
-package response;
+package result;
 
-public class JoinGameResponse {
+public class JoinGameResult {
     public String message;
     public int status;
 
-    public JoinGameResponse(String message, int status) {
+    public JoinGameResult(String message, int status) {
         this.message = message;
         this.status = status;
     }

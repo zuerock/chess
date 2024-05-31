@@ -1,10 +1,10 @@
 package handler;
 
 import com.google.gson.Gson;
-import dataAccess.AuthDAO;
-import dataAccess.UserDAO;
+import dataaccess.AuthDAO;
+import dataaccess.UserDAO;
 import request.LoginRequest;
-import response.LoginResponse;
+import result.LoginResult;
 import service.UserService;
 import spark.Request;
 import spark.Response;
@@ -15,8 +15,8 @@ public class LoginHandler {
         Gson myGson = new Gson();
         LoginRequest myRequest = myGson.fromJson(request.body(), LoginRequest.class);
         UserService myUserService = new UserService();
-        LoginResponse myLoginResponse = myUserService.loginRespond(myRequest, userObj, authObj);
-        response.status(myLoginResponse.status);
-        return myGson.toJson(myLoginResponse);
+        LoginResult myLoginResult = myUserService.loginResult(myRequest, userObj, authObj);
+        response.status(myLoginResult.status);
+        return myGson.toJson(myLoginResult);
     }
 }

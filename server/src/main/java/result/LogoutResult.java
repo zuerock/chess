@@ -1,10 +1,10 @@
-package response;
+package result;
 
-public class LogoutResponse {
+public class LogoutResult {
     public String message;
     public int status;
 
-    public LogoutResponse(String message, int status) {
+    public LogoutResult(String message, int status) {
         this.message = message;
         this.status = status;
     }

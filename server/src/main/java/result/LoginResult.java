@@ -1,12 +1,12 @@
-package response;
+package result;
 
-public class RegisterResponse {
+public class LoginResult {
     public String username;
     public String authToken;
     public String message;
     public int status;
 
-    public RegisterResponse(String username, String authToken, String message, int status) {
+    public LoginResult(String username, String authToken, String message, int status) {
         this.username = username;
         this.authToken = authToken;
         this.message = message;
