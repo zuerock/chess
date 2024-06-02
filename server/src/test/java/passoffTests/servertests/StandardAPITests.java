@@ -1,10 +1,10 @@
-package passoffTests.servertests;
+package passoff.server;
 
 import chess.ChessGame;
 import org.junit.jupiter.api.*;
 import passoff.model.*;
-import passoff.server.*;
 import server.Server;
+
 import java.net.HttpURLConnection;
 import java.util.Arrays;
 import java.util.Collection;
