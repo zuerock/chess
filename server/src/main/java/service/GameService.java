@@ -75,7 +75,7 @@ public class GameService {
                 if (gameObj.gameList.get(i).gameID() == req.getGameID()) {
                     if (req.getPlayerColor() == null) {
                         // Joins as observer
-                        return new JoinGameResult(null, 200);
+                        return new JoinGameResult("ERROR - Already taken", 400);
                     } else {
                         if (req.getPlayerColor() != null && req.getPlayerColor().equals("WHITE") && gameObj.gameList.get(i).whiteUsername() == null) {
                             String newWhite = authObj.authList.get(userNumber).username();
