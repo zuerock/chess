@@ -1,4 +1,4 @@
-package servicetests;
+package service;
 
 import dataaccess.AuthDAO;
 import dataaccess.GameDAO;
@@ -9,9 +9,6 @@ import request.JoinGameRequest;
 import request.LoginRequest;
 import request.RegisterRequest;
 import result.*;
-import service.DBService;
-import service.GameService;
-import service.UserService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
