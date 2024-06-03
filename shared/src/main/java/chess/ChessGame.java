@@ -14,7 +14,6 @@ public class ChessGame implements Cloneable {
 
     private ChessBoard chessBoard;
     private TeamColor currentTurn;
-    private boolean gameOver;
 
     public ChessGame() {
         this.chessBoard = new ChessBoard();
@@ -23,13 +22,6 @@ public class ChessGame implements Cloneable {
         this.gameOver = false;
     }
 
-    public boolean isGameOver() {
-        return gameOver;
-    }
-
-    public void setGameOver(boolean gameOver) {
-        this.gameOver = gameOver;
-    }
 
     /**
      * @return Which team's turn it is
