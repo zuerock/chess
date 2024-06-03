@@ -81,12 +81,12 @@ public class GameService {
                             String newWhite = authObj.authList.get(userNumber).username();
                             GameData gameToUpdate = new GameData(req.getGameID(), newWhite, gameObj.gameList.get(i).blackUsername(), gameObj.gameList.get(i).gameName(), gameObj.gameList.get(i).game());
                             gameObj.gameList.set(i, gameToUpdate);
-                            return new JoinGameResult("/", 200);
+                            return new JoinGameResult("", 200);
                         } else if (req.getPlayerColor() != null && req.getPlayerColor().equals("BLACK") && gameObj.gameList.get(i).blackUsername() == null) {
                             String newBlack = authObj.authList.get(userNumber).username();
                             GameData gameToUpdate = new GameData(req.getGameID(), gameObj.gameList.get(i).whiteUsername(), newBlack, gameObj.gameList.get(i).gameName(), gameObj.gameList.get(i).game());
                             gameObj.gameList.set(i, gameToUpdate);
-                            return new JoinGameResult("/", 200);
+                            return new JoinGameResult("", 200);
                         } else {
                             return new JoinGameResult("ERROR - Already taken", 403);
                         }
