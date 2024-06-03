@@ -21,7 +21,7 @@ public class Server {
 
         Spark.port(desiredPort);
 
-        Spark.staticFiles.location("web");
+        Spark.staticFiles.location("/web");
 
         // Register your endpoints and handle exceptions here.
         Spark.delete("/db", ((request, result) -> new ClearHandler().handle(request, result, userObj, authObj, gameObj)));
