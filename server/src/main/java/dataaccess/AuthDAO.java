@@ -3,17 +3,16 @@ package dataaccess;
 import model.AuthData;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-public class AuthDAO {
+public interface AuthDAO {
 
-    public List<AuthData> authList = new ArrayList<>();
+    AuthData addAuth(AuthData auth);
 
-    public void createAuth(AuthData auth){
-        authList.add(auth);
-    }
+    Collection<AuthData> authList();
 
-    public void clearAuthList(){
-        authList.clear();
-    }
+    void createAuth(AuthData auth);
+
+    void clearAuthList();
 }
