@@ -4,28 +4,28 @@ import model.GameData;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class GameDAO {
+public class GameDAO {
 
     public List<GameData> gameList = new ArrayList<>();
     public int currentID = 1;
 
-    public abstract void createGame(GameData game);
+    public void createGame(GameData game){};
 
-    public abstract int getCurrentID();
+    public int getCurrentID(){return currentID;};
 
-    public abstract void setCurrentID(int i);
+    public void setCurrentID(int i){};
 
-    public abstract void removeGame(int index);
+    public void removeGame(int index){};
 
-    public abstract GameData getGame(int index);
+    public GameData getGame(int index){return gameList.get(index);};
 
-    public abstract void setGame(int index, GameData game);
+    public void setGame(int index, GameData game){};
 
-    public abstract int getSize();
+    public int getSize(){return gameList.size();};
 
     public void clearGameList(){
         gameList.clear();
     }
 
-    public abstract List<GameData> returnGameList();
+    public List<GameData> returnGameList(){return gameList;};
 }
