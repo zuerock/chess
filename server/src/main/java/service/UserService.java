@@ -1,78 +1,139 @@
 package service;
 
-import dataaccess.AuthDAO;
-import dataaccess.UserDAO;
-import model.AuthData;
-import model.UserData;
-import request.LoginRequest;
-import request.RegisterRequest;
+import dataaccess.*;
+import request.*;
+import result.CreateGameResult;
+import result.ListGamesResult;
 import result.LoginResult;
-import result.LogoutResult;
 import result.RegisterResult;
 
 import java.util.UUID;
 
 public class UserService {
-    public RegisterResult regResult(RegisterRequest req, UserDAO userObj, AuthDAO authObj) {
-        String username = null;
-        String authToken = null;
-        String message = "";
-        int status = 200;
-
-        if (req.getUsername() == null || req.getPassword() == null || req.getEmail() == null) {
-            username = null;
-            authToken = null;
-            message = "ERROR - Bad request";
-            status = 400;
-            return new RegisterResult(username, authToken, message, status);
+    //change to sql daos
+    private final AuthDAO authDAO;
+    {
+        try {
+            authDAO = new SQLAuthDAO();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
         }
-
-        for (int i = 0; i < userObj.userList.size(); i = i + 1) {
-            if (userObj.userList.get(i).username().equals(req.getUsername())) {
-                username = null;
-                authToken = null;
-                message = "ERROR - User already exists";
-                status = 403;
-                return new RegisterResult(username, authToken, message, status);
-            }
+    }
+    private final GameDAO gameDAO ;
+    {
+        try {
+            gameDAO = new SQLGameDAO();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
         }
-
-        UserData userDataToAdd = new UserData(req.getUsername(), req.getPassword(), req.getEmail());
-        AuthData authDataToAdd = new AuthData(UUID.randomUUID().toString(), req.getUsername());
-        username = req.getUsername();
-        userObj.createUser(userDataToAdd);
-        authObj.createAuth(authDataToAdd);
-        authToken = authDataToAdd.authToken();
-
-        return new RegisterResult(username, authToken, message, status);
+    }
+    private final UserDAO userDAO;
+    {
+        try {
+            userDAO = new SQLUserDAO();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public LoginResult loginResult(LoginRequest req, UserDAO userObj, AuthDAO authObj) {
-        String username = req.getUsername();
-        String authToken = "";
-
-        for (int i = 0; i < userObj.userList.size(); i = i + 1) {
-            if (userObj.userList.get(i).username().equals(req.getUsername()) && req.password.equals(userObj.userList.get(i).password())) {
-                authToken = UUID.randomUUID().toString();
-                authObj.authList.add(new AuthData(authToken, username));
-                return new LoginResult(username, authToken, "", 200);
-            }
-            else {
-                return new LoginResult(null, null, "ERROR - Unauthorized", 401);
-            }
+    public void clear() throws DataAccessException {
+        //try catch
+        try {
+            authDAO.clear();
+        } catch (DataAccessException e) {
+            throw e;
         }
-
-        return new LoginResult(null, null, "ERROR - User does not exist", 401);
+        try {
+            gameDAO.clear();
+        } catch (DataAccessException e) {
+            throw e;
+        }
+        try {
+            userDAO.clear();
+        } catch (DataAccessException e) {
+            throw e;
+        }
     }
 
-    public LogoutResult logoutResult(String authToken, AuthDAO authObj) {
-        for (int i = 0; i < authObj.authList.size(); i = i + 1) {
-            if (authToken.equals(authObj.authList.get(i).authToken())) {
-                authObj.authList.remove(i);
-                return new LogoutResult(null, 200);
-            }
+    //return type register result
+    public RegisterResult register(RegisterRequest request) throws DataAccessException {
+        String authToken;
+        try {
+            userDAO.createUser(request);
+            authToken = UUID.randomUUID().toString();
+            authDAO.createAuth(authToken, request.username());
+            return new RegisterResult(request.username(), authToken);
+        } catch (DataAccessException e) {
+            throw e;
         }
+    }
 
-        return new LogoutResult("ERROR - Unauthorized", 401);
+    public LoginResult login(LoginRequest loginRequest) throws DataAccessException {
+        String authToken;
+        try {
+            userDAO.validateUserPassword(loginRequest.username(), loginRequest.password());
+            authToken = UUID.randomUUID().toString();
+            authDAO.createAuth(authToken, loginRequest.username());
+            return new LoginResult(loginRequest.username(), authToken);
+        } catch (DataAccessException e) {
+            throw e;
+        }
+    }
+
+    public void logout(String authToken) throws DataAccessException {
+        try {
+            authDAO.authExists(authToken);
+            authDAO.deleteAuth(authToken);
+        }
+        catch (DataAccessException e){
+            throw e;
+        }
+    }
+
+    public ListGamesResult listGames(String authToken) throws DataAccessException{
+        try{
+            authDAO.authExists(authToken);
+        }
+        catch (DataAccessException e){
+            throw e;
+        }
+        try {
+            return gameDAO.listGame();
+        }
+        catch (DataAccessException e){
+            throw e;
+        }
+    }
+
+    public CreateGameResult createGame(CreateGameRequest request, String authToken) throws DataAccessException{
+        try{
+            authDAO.authExists(authToken);
+        }
+        catch (DataAccessException e){
+            throw e;
+        }
+        try{
+            return gameDAO.createGame(request);
+        }
+        catch (DataAccessException e){
+            throw e;
+        }
+    }
+
+    public void joinGame(JoinGameRequest joinGameRequest, String authToken) throws DataAccessException{
+        String username;
+        try{
+            authDAO.authExists(authToken);
+            username = authDAO.getUserFromAuth(authToken);
+        }
+        catch (DataAccessException e){
+            throw e;
+        }
+        try{
+            gameDAO.joinGame(joinGameRequest, username);
+        }
+        catch (DataAccessException e){
+            throw e;
+        }
     }
 }

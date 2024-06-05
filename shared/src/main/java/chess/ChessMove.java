@@ -1,5 +1,7 @@
 package chess;
 
+import java.util.Objects;
+
 /**
  * Represents moving a chess piece on a chessboard
  * <p>
@@ -8,16 +10,19 @@ package chess;
  */
 public class ChessMove {
 
-    private final ChessPosition startPosition;
-    private final ChessPosition endPosition;
-    private final ChessPiece.PieceType promotionPiece;
-
+    private ChessPosition startPosition;
+    private ChessPosition endPosition;
+    private ChessPiece.PieceType promotionPiece;
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
                      ChessPiece.PieceType promotionPiece) {
         this.startPosition = startPosition;
         this.endPosition = endPosition;
         this.promotionPiece = promotionPiece;
     }
+
+    /**
+     * @return ChessPosition of starting location
+     */
     public ChessPosition getStartPosition() {
         return this.startPosition;
     }
@@ -38,51 +43,17 @@ public class ChessMove {
     public ChessPiece.PieceType getPromotionPiece() {
         return this.promotionPiece;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessMove chessMove = (ChessMove) o;
+        return Objects.equals(startPosition, chessMove.startPosition) && Objects.equals(endPosition, chessMove.endPosition) && promotionPiece == chessMove.promotionPiece;
+    }
+
     @Override
     public int hashCode() {
-        int hash;
-        hash = startPosition.getRow() * 157 + startPosition.getColumn();
-        hash += endPosition.getRow() * 31 + endPosition.getColumn();
-        if(promotionPiece != null){
-            switch (promotionPiece){
-                case QUEEN:
-                    hash += 11;
-                    break;
-                case BISHOP:
-                    hash += 17;
-                    break;
-                case KNIGHT:
-                    hash += 23;
-                    break;
-                case ROOK:
-                    hash += 29;
-                    break;
-                default:
-                    hash += 1;
-            }
-        }
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if(obj == this){
-            return true;
-        }
-
-        if(!(obj instanceof ChessMove c)){
-            return false;
-        }
-
-        return this.startPosition.equals(c.startPosition) && this.endPosition.equals(c.endPosition) && promotionPiece == c.promotionPiece;
-    }
-
-    @Override
-    public String toString() {
-        return "Move{" +
-                startPosition +
-                ", " + endPosition +
-                ", " + promotionPiece +
-                "}\n";
+        return Objects.hash(startPosition, endPosition, promotionPiece);
     }
 }
