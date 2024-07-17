@@ -1,19 +1,17 @@
 package dataaccess;
 
-import model.AuthData;
+import java.sql.SQLException;
 
-import java.util.ArrayList;
-import java.util.List;
+public interface AuthDAO {
+    String createAuth(String username) throws DataAccessException;
 
-public class AuthDAO {
+    String getAuth(String authToken) throws DataAccessException;
 
-    public List<AuthData> authList = new ArrayList<>();
+    String getUsername(String authToken) throws DataAccessException;
 
-    public void createAuth(AuthData auth){
-        authList.add(auth);
-    }
+    void deleteAuth(String authToken) throws DataAccessException;
 
-    public void clearAuthList(){
-        authList.clear();
-    }
+    void removeAllAuthTokens() throws DataAccessException;
+
+    boolean isEmpty() throws DataAccessException;
 }

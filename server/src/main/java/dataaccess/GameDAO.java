@@ -1,31 +1,20 @@
 package dataaccess;
 
 import model.GameData;
-import java.util.ArrayList;
-import java.util.List;
 
-public class GameDAO {
+import java.sql.SQLException;
+import java.util.Collection;
 
-    public List<GameData> gameList = new ArrayList<>();
-    public int currentID = 1;
+public interface GameDAO {
+    Integer createGame(String gameName, Integer gameID) throws DataAccessException;
 
-    public void createGame(GameData game){};
+    GameData getGame(Integer gameID) throws DataAccessException;
 
-    public int getCurrentID(){return currentID;};
+    Collection<GameData> listGames() throws DataAccessException;
 
-    public void setCurrentID(int i){};
+    void saveGame(int gameID, GameData game) throws DataAccessException;
 
-    public void removeGame(int index){};
+    void removeAllGames() throws DataAccessException;
 
-    public GameData getGame(int index){return gameList.get(index);};
-
-    public void setGame(int index, GameData game){};
-
-    public int getSize(){return gameList.size();};
-
-    public void clearGameList(){
-        gameList.clear();
-    }
-
-    public List<GameData> returnGameList(){return gameList;};
+    boolean isEmpty() throws DataAccessException;
 }

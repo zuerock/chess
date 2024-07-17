@@ -1,78 +1,91 @@
 package service;
 
-import dataaccess.AuthDAO;
-import dataaccess.UserDAO;
+import dataaccess.*;
 import model.AuthData;
 import model.UserData;
-import request.LoginRequest;
-import request.RegisterRequest;
-import result.LoginResult;
-import result.LogoutResult;
-import result.RegisterResult;
+import org.mindrot.jbcrypt.BCrypt;
 
-import java.util.UUID;
 
 public class UserService {
-    public RegisterResult regResult(RegisterRequest req, UserDAO userObj, AuthDAO authObj) {
-        String username = null;
-        String authToken = null;
-        String message = "";
-        int status = 200;
+    private final UserDAO userDAO;
+    private final AuthDAO authDAO;
 
-        if (req.getUsername() == null || req.getPassword() == null || req.getEmail() == null) {
-            username = null;
-            authToken = null;
-            message = "ERROR - Bad request";
-            status = 400;
-            return new RegisterResult(username, authToken, message, status);
-        }
-
-        for (int i = 0; i < userObj.userList.size(); i = i + 1) {
-            if (userObj.userList.get(i).username().equals(req.getUsername())) {
-                username = null;
-                authToken = null;
-                message = "ERROR - User already exists";
-                status = 403;
-                return new RegisterResult(username, authToken, message, status);
-            }
-        }
-
-        UserData userDataToAdd = new UserData(req.getUsername(), req.getPassword(), req.getEmail());
-        AuthData authDataToAdd = new AuthData(UUID.randomUUID().toString(), req.getUsername());
-        username = req.getUsername();
-        userObj.createUser(userDataToAdd);
-        authObj.createAuth(authDataToAdd);
-        authToken = authDataToAdd.authToken();
-
-        return new RegisterResult(username, authToken, message, status);
+    public UserService() {
+        this.userDAO = new SQLUserDAO();
+        this.authDAO = new SQLAuthDAO();
     }
 
-    public LoginResult loginResult(LoginRequest req, UserDAO userObj, AuthDAO authObj) {
-        String username = req.getUsername();
-        String authToken = "";
+    public AuthData register(UserData user) throws DataAccessException {
 
-        for (int i = 0; i < userObj.userList.size(); i = i + 1) {
-            if (userObj.userList.get(i).username().equals(req.getUsername()) && req.password.equals(userObj.userList.get(i).password())) {
-                authToken = UUID.randomUUID().toString();
-                authObj.authList.add(new AuthData(authToken, username));
-                return new LoginResult(username, authToken, "", 200);
-            }
-            else {
-                return new LoginResult(null, null, "ERROR - Unauthorized", 401);
-            }
+        // test if all fields are filled
+        if (user.username() == null || user.password() == null || user.email() == null) {
+            throw new DataAccessException("bad request");
         }
 
-        return new LoginResult(null, null, "ERROR - User does not exist", 401);
+        // test if username is already taken
+        if (userDAO.getUser(user.username()) != null) {
+            throw new DataAccessException("already taken");
+        }
+
+        // create user and store in database
+        String username = user.username();
+        String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt()); // hash password before storing
+        String email = user.email();
+
+        UserData newUser = new UserData(username, hashedPassword, email);
+
+        userDAO.createUser(newUser); // store user in database
+
+        String token = authDAO.createAuth(username); // get auth token for user
+
+        // registration successful, returning AuthData object
+        return new AuthData(token, username);
     }
 
-    public LogoutResult logoutResult(String authToken, AuthDAO authObj) {
-        for (int i = 0; i < authObj.authList.size(); i = i + 1) {
-            if (authToken.equals(authObj.authList.get(i).authToken())) {
-                authObj.authList.remove(i);
-                return new LogoutResult(null, 200);
-            }
+    public AuthData login(UserData loginData) throws DataAccessException {
+        // test if all fields are filled
+        if (loginData.username() == null || loginData.password() == null) {
+            throw new DataAccessException("must fill all fields");
         }
 
-        return new LogoutResult("ERROR - Unauthorized", 401);
+        // check for bad username
+        if (userDAO.getUser(loginData.username()) == null) {
+            throw new DataAccessException("unauthorized");
+        }
+
+        // check if given password matches the one in the database
+        String username = loginData.username();
+
+        UserData savedUser = userDAO.getUser(username);
+        String givenPassword = loginData.password();
+        String savedPassword = savedUser.password(); // should return hashed password
+        if (!verifyPassword(givenPassword, savedPassword)) {
+            throw new DataAccessException("unauthorized");
+        }
+
+        // correct password given, create and return auth token
+        String token = authDAO.createAuth(username);
+        return new AuthData(token, username);
+    }
+
+    public void logout(String authToken) throws DataAccessException {
+        // check if authToken is correct
+        if (verifyAuth(authToken)) {
+            // delete authToken from database
+            authDAO.deleteAuth(authToken);
+        }
+
+        // return true if logout is successful
+        if ( authDAO.getAuth(authToken) != null) throw new DataAccessException("logout failed");
+    }
+
+    private boolean verifyPassword(String givenPassword, String savedHashedPassword) {
+        return BCrypt.checkpw(givenPassword, savedHashedPassword);
+    }
+
+    private boolean verifyAuth(String authToken) throws DataAccessException {
+        if (authToken == null || authDAO.getAuth(authToken) == null) {
+            throw new DataAccessException("unauthorized");
+        } else return true;
     }
 }

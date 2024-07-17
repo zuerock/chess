@@ -1,24 +1,15 @@
 package dataaccess;
 
-
 import model.UserData;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.SQLException;
 
-public class UserDAO {
-    public List<UserData> userList = new ArrayList<>();
+public interface UserDAO {
+    void createUser(UserData user) throws DataAccessException;
 
-    public void createUser(UserData user){
-        userList.add(user);
-    }
-    public void deleteUser(UserData user){
-        userList.remove(user);
-    }
+    UserData getUser(String username) throws DataAccessException;
 
-    List<UserData> getUser(){return userList;}
+    void removeAllUsers() throws DataAccessException;
 
-    public void clearUserList(){
-        userList.clear();
-    }
+    boolean isEmpty() throws DataAccessException;
 }

@@ -1,19 +1,16 @@
 package dataaccess;
 
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.Properties;
 
-import static java.sql.Types.NULL;
-
 public class DatabaseManager {
-    private static final String databaseName;
-    private static final String user;
-    private static final String password;
-    private static final String connectionUrl;
+    private static final String DATABASE_NAME;
+    private static final String USER;
+    private static final String PASSWORD;
+    private static final String CONNECTION_URL;
 
     /*
-     * Load the database information from the db.properties file.
+     * Load the database information for the db.properties file.
      */
     static {
         try {
@@ -21,13 +18,13 @@ public class DatabaseManager {
                 if (propStream == null) throw new Exception("Unable to load db.properties");
                 Properties props = new Properties();
                 props.load(propStream);
-                databaseName = props.getProperty("db.name");
-                user = props.getProperty("db.user");
-                password = props.getProperty("db.password");
+                DATABASE_NAME = props.getProperty("db.name");
+                USER = props.getProperty("db.user");
+                PASSWORD = props.getProperty("db.password");
 
                 var host = props.getProperty("db.host");
                 var port = Integer.parseInt(props.getProperty("db.port"));
-                connectionUrl = String.format("jdbc:mysql://%s:%d", host, port);
+                CONNECTION_URL = String.format("jdbc:mysql://%s:%d", host, port);
             }
         } catch (Exception ex) {
             throw new RuntimeException("unable to process db.properties. " + ex.getMessage());
@@ -35,14 +32,45 @@ public class DatabaseManager {
     }
 
     /**
-     * Create the database if it does not already exist
-     *
-     * @throws DataAccessException if the SQL connector fails
+     * Creates the database if it does not already exist.
      */
     public static void createDatabase() throws DataAccessException {
         try {
-            var statement = "CREATE DATABASE IF NOT EXISTS " + databaseName;
-            var conn = DriverManager.getConnection(connectionUrl, user, password);
+            var statement = "CREATE DATABASE IF NOT EXISTS " + DATABASE_NAME;
+            var conn = DriverManager.getConnection(CONNECTION_URL, USER, PASSWORD);
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.executeUpdate();
+            }
+
+            conn.setCatalog(DATABASE_NAME);
+
+            // Create users table
+            statement = "CREATE TABLE IF NOT EXISTS users (" +
+                        "username VARCHAR(255) PRIMARY KEY , " +
+                        "password VARCHAR(255), " +
+                        "email VARCHAR(255)" +
+                        ")";
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.executeUpdate();
+            }
+
+            // Create the games table
+            statement = "CREATE TABLE IF NOT EXISTS games (" +
+                        "gameID VARCHAR(255) NOT NULL PRIMARY KEY ," +
+                        "whiteUsername VARCHAR(255)," +
+                        "blackUsername VARCHAR(255)," +
+                        "gameName VARCHAR(255)," +
+                        "game longtext" +
+                        ")";
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.executeUpdate();
+            }
+
+            // Create the auths table
+            statement = "CREATE TABLE IF NOT EXISTS auths (" +
+                        "authToken VARCHAR(255) PRIMARY KEY , " +
+                        "username VARCHAR(255)" +
+                        ")";
             try (var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.executeUpdate();
             }
@@ -52,10 +80,9 @@ public class DatabaseManager {
     }
 
     /**
-     * Create a connection to the database and set the catalog based upon the
-     * properties specified in db.properties
-     * NOTE: Connections to the database should be short-lived,
-     * and you must close the connection when you are done with it.
+     * Create a connection to the database and sets the catalog based upon the
+     * properties specified in db.properties. Connections to the database should
+     * be short-lived, and you must close the connection when you are done with it.
      * The easiest way to do that is with a try-with-resource block.
      * <br/>
      * <code>
@@ -63,88 +90,14 @@ public class DatabaseManager {
      * // execute SQL statements.
      * }
      * </code>
-     *
-     * @return a new connection to the SQL database
-     * @throws DataAccessException if the connection process fails
      */
-    public static Connection getConnection() throws DataAccessException {
+    static Connection getConnection() throws DataAccessException {
         try {
-            var conn = DriverManager.getConnection(connectionUrl, user, password);
-            conn.setCatalog(databaseName);
+            var conn = DriverManager.getConnection(CONNECTION_URL, USER, PASSWORD);
+            conn.setCatalog(DATABASE_NAME);
             return conn;
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
         }
-    }
-
-    /**
-     * Update the database with a given SQL statement
-     *
-     * @param statement the SQL statement to execute
-     * @param params    the SQL parameters to set (verifying types)
-     * @return the int value of the first key generated by the update
-     * (key must be in first column, return 0 if irrelevant)
-     * @throws DataAccessException if the SQL connector fails
-     */
-    public static int executeUpdate(String statement, Object... params) throws DataAccessException {
-        try (Connection connection = DatabaseManager.getConnection()) {
-            try (PreparedStatement preparedStatement =
-                         connection.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)) {
-                for (int i = 0; i < params.length; ++i) {
-                    switch (params[i]) {
-                        case null -> preparedStatement.setNull((i + 1), NULL);
-                        case String p -> preparedStatement.setString((i + 1), p);
-                        case Integer p -> preparedStatement.setInt((i + 1), p);
-                        default -> throw new DataAccessException("invalid database input type");
-                    }
-                }
-                preparedStatement.executeUpdate();
-                ResultSet resultSet = preparedStatement.getGeneratedKeys();
-                if (resultSet.next()) {
-                    return resultSet.getInt(1);
-                }
-                return 0;
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException(String.format("Could not update database: %s, %s", statement, e.getMessage()));
-        }
-    }
-
-    /**
-     * Query the database with a given SQL statement
-     *
-     * @param returnLabels the labels of each result row
-     * @param statement    the SQL statement to execute
-     * @param params       the SQL parameters to set (verifying types)
-     * @return an ArrayList (rows) of Object arrays (elements)
-     * @throws DataAccessException if the SQL connector fails
-     */
-    public static ArrayList<Object[]> executeQuery(String[] returnLabels,
-                                                   String statement,
-                                                   Object... params) throws DataAccessException {
-        ArrayList<Object[]> result = new ArrayList<>();
-        try (Connection connection = DatabaseManager.getConnection()) {
-            try (PreparedStatement preparedStatement = connection.prepareStatement(statement)) {
-                for (int i = 0; i < params.length; ++i) {
-                    switch (params[i]) {
-                        case String p -> preparedStatement.setString((i + 1), p);
-                        case Integer p -> preparedStatement.setInt((i + 1), p);
-                        default -> preparedStatement.setNull((i + 1), NULL);
-                    }
-                }
-                try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                    while (resultSet.next()) {
-                        Object[] row = new Object[returnLabels.length];
-                        for (int i = 0; i < row.length; ++i) {
-                            row[i] = resultSet.getObject(returnLabels[i]);
-                        }
-                        result.add(row);
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException(String.format("Could not query database: %s, %s", statement, e.getMessage()));
-        }
-        return result;
     }
 }
