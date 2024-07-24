@@ -331,6 +331,7 @@ public class MyAPITests {
             // TEST HERE -> join game
             gameService.joinGame(token,"WHITE",gameID);
             System.out.println("success");
+            userService.logout(token);
         }
 
         @Test
