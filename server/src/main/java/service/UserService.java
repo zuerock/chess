@@ -24,7 +24,7 @@ public class UserService {
 
         // test if username is already taken
         if (userDAO.getUser(user.username()) != null) {
-            throw new DataAccessException("already taken " + user.username());
+            throw new DataAccessException("already taken");
         }
 
         // create user and store in database
