@@ -14,8 +14,6 @@ public interface GameDAO {
 
     void saveGame(int gameID, GameData game) throws DataAccessException;
 
-    void deleteGame(int gameID, GameData game) throws DataAccessException;
-
     void removeAllGames() throws DataAccessException;
 
     boolean isEmpty() throws DataAccessException;
