@@ -24,7 +24,7 @@ public class UserService {
 
         // test if username is already taken
         if (userDAO.getUser(user.username()) != null) {
-            throw new DataAccessException("already taken");
+            throw new DataAccessException("already taken " + user.username());
         }
 
         // create user and store in database
@@ -76,7 +76,7 @@ public class UserService {
         }
 
         // return true if logout is successful
-        if ( authDAO.getAuth(authToken) != null) throw new DataAccessException("logout failed");
+        if (authDAO.getAuth(authToken) != null) throw new DataAccessException("logout failed");
     }
 
     private boolean verifyPassword(String givenPassword, String savedHashedPassword) {
@@ -87,5 +87,13 @@ public class UserService {
         if (authToken == null || authDAO.getAuth(authToken) == null) {
             throw new DataAccessException("unauthorized");
         } else return true;
+    }
+
+    public void deleteUser(String authToken) throws DataAccessException {
+        // check if authToken is correct
+        if (verifyAuth(authToken)) {
+            // delete authToken from database
+            userDAO.removeAllUsers();
+        }
     }
 }

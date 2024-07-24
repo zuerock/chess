@@ -87,6 +87,22 @@ public class SQLGameDAO implements GameDAO{
     }
 
     @Override
+    public void deleteGame(int id, GameData game) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement("DELETE FROM games WHERE gameID = ?")) {
+                preparedStatement.setString(3, game.gameName());
+                var gameJson = new Gson().toJson(game); // serialize game
+                preparedStatement.setString(4, gameJson);
+                preparedStatement.setInt(5, id);
+
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
+    }
+
+    @Override
     public void removeAllGames() throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             // clear all data from games table

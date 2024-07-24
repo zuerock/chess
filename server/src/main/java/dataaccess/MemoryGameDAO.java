@@ -36,6 +36,12 @@ public class MemoryGameDAO implements GameDAO {
         }
     }
 
+    public void deleteGame(int gameID, GameData game) throws DataAccessException {
+        if (games.containsKey(gameID)) {
+            games.remove(gameID, game);
+        }
+    }
+
     public void removeAllGames() {
         games.clear();
     }

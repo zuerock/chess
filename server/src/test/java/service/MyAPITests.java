@@ -331,7 +331,7 @@ public class MyAPITests {
             // TEST HERE -> join game
             gameService.joinGame(token,"WHITE",gameID);
             System.out.println("success");
-            userService.logout(token);
+
         }
 
         @Test
@@ -349,7 +349,7 @@ public class MyAPITests {
 
             // login the test users, get auth tokens back
             AuthData testToken = userService.login(testUser);
-            String token = testToken.authToken();
+            String token1 = testToken.authToken();
 
             AuthData testToken2 = userService.login(testUser2);
             String token2 = testToken2.authToken();
@@ -358,8 +358,8 @@ public class MyAPITests {
             GameService gameService = new GameService();
 
             // create a game, populate with a white player
-            Integer gameID = gameService.createGame(token, "testGame");
-            gameService.joinGame(token, "WHITE", gameID);
+            Integer gameID = gameService.createGame(token1, "testGame");
+            gameService.joinGame(token1, "WHITE", gameID);
 
             // TEST HERE -> join game with another white player
             Exception exception = assertThrows(DataAccessException.class, () -> {

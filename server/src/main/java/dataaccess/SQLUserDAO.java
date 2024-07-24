@@ -1,5 +1,7 @@
 package dataaccess;
 
+import com.google.gson.Gson;
+import model.GameData;
 import model.UserData;
 
 import java.sql.Connection;
@@ -63,6 +65,17 @@ public class SQLUserDAO implements UserDAO{
                 try (var resultSet = preparedStatement.executeQuery()) { // should return false if there isn't a row in the table
                     return !resultSet.next();
                 }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
+    }
+
+    public void deleteUser(UserData user) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement("DELETE FROM users WHERE userName = ?")) {
+
+                preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
