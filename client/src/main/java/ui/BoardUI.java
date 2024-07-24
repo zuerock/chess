@@ -118,5 +118,39 @@ public class BoardUI {
         }
     }
 
+    private static String getPiece(int boardRow, int boardCol) {
+        ChessPosition position = new ChessPosition(boardRow, boardCol);
+
+        if (board.getPiece(position) == null) {
+            return EMPTY;
+        }
+
+        ChessPiece piece = board.getPiece(position);
+        String pieceString = "";
+
+        switch (piece.getTeamColor()) {
+            case WHITE -> {
+                switch (piece.getPieceType()) {
+                    case KING -> pieceString = WHITE_KING;
+                    case QUEEN -> pieceString = WHITE_QUEEN;
+                    case ROOK -> pieceString = WHITE_ROOK;
+                    case BISHOP -> pieceString = WHITE_BISHOP;
+                    case KNIGHT -> pieceString = WHITE_KNIGHT;
+                    case PAWN -> pieceString = WHITE_PAWN;
+                }
+            }
+            case BLACK -> {
+                switch (piece.getPieceType()) {
+                    case KING -> pieceString = BLACK_KING;
+                    case QUEEN -> pieceString = BLACK_QUEEN;
+                    case ROOK -> pieceString = BLACK_ROOK;
+                    case BISHOP -> pieceString = BLACK_BISHOP;
+                    case KNIGHT -> pieceString = BLACK_KNIGHT;
+                    case PAWN -> pieceString = BLACK_PAWN;
+                }
+            }
+        }
+        return pieceString;
+    }
 }
 
