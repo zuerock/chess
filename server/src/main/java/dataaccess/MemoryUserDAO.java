@@ -15,8 +15,6 @@ public class MemoryUserDAO implements UserDAO {
         users.put(user.username(), user);
     }
 
-    public void deleteUser(UserData user) {users.get(user.username());}
-
     public UserData getUser(String username) {
         return users.get(username);
     }
