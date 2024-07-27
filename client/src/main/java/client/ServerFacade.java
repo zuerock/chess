@@ -158,3 +158,62 @@ public class ServerFacade {
 
         return new AuthData(res.get("authToken"), res.get("username"));
     }
+
+    public int logout(String authToken) throws IOException {
+        this.authToken = authToken;
+        URL url = new URL(baseUrl + "/session");
+        JsonObject reqJson = new JsonObject();
+        reqJson.addProperty("authToken", authToken);
+        return doDelete(url, reqJson);
+    }
+
+    public Collection<GameData> listGames(String authToken) throws IOException {
+        this.authToken = authToken;
+        URL url = new URL(baseUrl + "/game");
+
+        // Create JSON object with auth token
+        JsonObject reqJson = new JsonObject();
+        reqJson.addProperty("authToken", authToken);
+
+        // get list
+        Map<String, String> res = doGet(url);
+
+        // convert list to collection
+        Type collectionType = new TypeToken<Collection<GameData>>() {}.getType();
+        Collection<GameData> gameList = new Gson().fromJson(new Gson().toJson(res.get("games")), collectionType);
+
+        return gameList;
+    }
+
+    public Integer createGame(String authToken, String gameName) throws IOException {
+        this.authToken = authToken;
+        URL url = new URL(baseUrl + "/game");
+
+        // Create JSON object with game name and auth token
+        JsonObject reqJson = new JsonObject();
+        reqJson.addProperty("authToken", authToken);
+        reqJson.addProperty("gameName", gameName);
+        Map<String, String> res = doPost(url, reqJson);
+
+        return Integer.valueOf(res.get("gameID"));
+    }
+
+    public int joinGame(String authToken, String playerColor, int gameId) throws IOException {
+        this.authToken = authToken;
+        URL url = new URL(baseUrl + "/game");
+
+        // Create JSON object with auth token, player color, and game ID
+        JsonObject reqJson = new JsonObject();
+        reqJson.addProperty("authToken", authToken);
+        reqJson.addProperty("playerColor", playerColor);
+        reqJson.addProperty("gameID", gameId);
+
+        return doPut(url, reqJson);
+    }
+
+    public void clear() throws IOException {
+        URL url = new URL(baseUrl + "/db");
+        JsonObject reqJson = new JsonObject();
+        doDelete(url, reqJson);
+    }
+}
