@@ -77,3 +77,84 @@ public class ServerFacade {
             throw new IOException("Failed to get: HTTP error code : " + responseBody);
         }
     }
+
+    public int doPut (URL url, JsonObject reqJson) throws IOException {
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+        connection.setReadTimeout(5000);
+        connection.setRequestMethod("PUT");
+        connection.setDoOutput(true);
+
+        //write out header
+        connection.addRequestProperty("Authorization", authToken);
+
+        // write json to output stream
+        try (OutputStream outputStream = connection.getOutputStream()) {
+            var jsonBody = new Gson().toJson(reqJson);
+            outputStream.write(jsonBody.getBytes());
+        }
+
+        // check response
+        int responseCode = connection.getResponseCode();
+        //System.out.println("Response Code: " + responseCode);
+        if (responseCode != HttpURLConnection.HTTP_OK) {
+            // TODO: correctly handle error response
+            throw new IOException("Failed to join game: HTTP error code : " + responseCode);
+        }
+
+        return responseCode;
+    }
+
+    public int doDelete(URL url, JsonObject reqJson) throws IOException {
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+        connection.setReadTimeout(5000);
+        connection.setRequestMethod("DELETE");
+        connection.setDoOutput(true);
+
+        //write out header
+        connection.addRequestProperty("Authorization", authToken);
+
+        // write json to output stream
+        try (OutputStream outputStream = connection.getOutputStream()) {
+            var jsonBody = new Gson().toJson(reqJson);
+            outputStream.write(jsonBody.getBytes());
+        }
+
+        // check response
+        int responseCode = connection.getResponseCode();
+        //System.out.println("Response Code: " + responseCode);
+        if (responseCode != HttpURLConnection.HTTP_OK) {
+            // TODO: correctly handle error response
+            throw new IOException("Failed to delete: HTTP error code : " + responseCode);
+        }
+
+        return responseCode;
+    }
+
+
+    public AuthData register(String username, String password, String email) throws IOException {
+        URL url = new URL(baseUrl + "/user");
+
+        // Create JSON object with registration details
+        JsonObject reqJson = new JsonObject();
+        reqJson.addProperty("username", username);
+        reqJson.addProperty("password", password);
+        reqJson.addProperty("email", email);
+        Map<String, String> res = doPost(url, reqJson);
+
+
+        return new AuthData(res.get("authToken"), res.get("username"));
+    }
+
+    public AuthData login(String username, String password) throws IOException {
+        URL url = new URL(baseUrl + "/session");
+
+        // Create JSON object with login details
+        JsonObject reqJson = new JsonObject();
+        reqJson.addProperty("username", username);
+        reqJson.addProperty("password", password);
+        Map<String, String> res = doPost(url, reqJson);
+
+        return new AuthData(res.get("authToken"), res.get("username"));
+    }
