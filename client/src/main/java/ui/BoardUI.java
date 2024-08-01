@@ -23,7 +23,12 @@ public class BoardUI {
     }
 
 
-    public void printBoard(ChessGame.TeamColor givenTeam) { // if given a specific team, print that board instead
+    public static void printBoard() { // print board for current team
+        teamColor = game.getTeamTurn();
+        printBoard(game.getTeamTurn());
+    }
+
+    public static void printBoard(ChessGame.TeamColor givenTeam) { // if given a specific team, print that board instead
         teamColor = givenTeam;
 
         out.println();
@@ -31,7 +36,6 @@ public class BoardUI {
         prepareRows();
         drawHeader();
     }
-
 
 
     private static void drawHeader() {

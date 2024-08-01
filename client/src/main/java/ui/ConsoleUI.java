@@ -16,7 +16,7 @@ import static chess.ChessGame.TeamColor.WHITE;
 import static ui.EscapeSequences.*;
 
 public class ConsoleUI {
-    private ServerFacade facade;
+    private final ServerFacade facade;
     private ChessBoard board;
     private ChessGame game;
     private AuthData auth;
@@ -38,9 +38,9 @@ public class ConsoleUI {
 
 
     public void run() {
-        var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
+        out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         String input = "";
-        Scanner scanner = new Scanner(System.in);
+        in = new Scanner(System.in);
 
         out.print(ERASE_SCREEN);
         out.println("♕ Welcome to 240 chess. Type 'help' to get started. ♕");
@@ -48,11 +48,11 @@ public class ConsoleUI {
         while (!Objects.equals(input, "quit")) {
             if (!(loggedIn)) {
                 out.print("[LOGGED_OUT] >>> ");
-                input = scanner.nextLine();
+                input = in.nextLine();
                 preLogin(input);
             } else {
                 out.print("[LOGGED_IN] >>> ");
-                input = scanner.nextLine();
+                input = in.nextLine();
                 postLogin(input);
             }
         }
@@ -158,11 +158,11 @@ public class ConsoleUI {
 
                 if (team.equals("WHITE")){
                     teamColor = WHITE;
-                    new BoardUI(out, game).printBoard(WHITE);
+                    new BoardUI(out, game).printBoard(teamColor);
                 }
                 else{
                     teamColor = ChessGame.TeamColor.BLACK;
-                    new BoardUI(out, game).printBoard(ChessGame.TeamColor.BLACK);
+                    new BoardUI(out, game).printBoard(teamColor);
                 }
             } catch (Exception e) {
                 out.println(e.getMessage());
