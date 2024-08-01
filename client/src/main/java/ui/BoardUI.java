@@ -64,7 +64,7 @@ public class BoardUI {
             }
             // print header row
             else {
-                int paddingSize = (EMPTY.length() - 1) / 2; // Subtract 1 for the letter itself
+                int paddingSize = (EMPTY.length())/2; // Subtract 1 for the letter itself
                 String headerSquare = String.format("%" + paddingSize + "s" + headers[col - 1] + "%" + paddingSize + "s", "", "");
                 out.print(headerSquare);
             }
