@@ -9,8 +9,10 @@ public class BoardUI {
     private static final int DRAWING_SIZE_IN_SQUARES = 10;
     private static final int BOARD_SIZE_IN_SQUARES = 8;
 
-    private static ChessBoard board = new ChessBoard();
+    private static ChessBoard board;
     private PrintStream out;
+    private ChessGame game;
+    private ChessGame.TeamColor teamColor;
 
 
     public BoardUI() {
