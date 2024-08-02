@@ -115,7 +115,7 @@ public class ServerFacadeTests {
         void goodCreateGame() throws Exception {
             AuthData authData = registerSetup("testUser", "testPassword", "testEmail");
 
-            int id;
+            int id = -1;
             id = facade.createGame(authData.authToken(), "testGame");
             assertTrue(id > 0);
         }

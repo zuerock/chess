@@ -1,6 +1,7 @@
 package ui;
 
 import java.io.PrintStream;
+import java.util.Collection;
 
 import chess.*;
 
@@ -16,10 +17,10 @@ public class BoardUI {
     private static ChessGame.TeamColor teamColor;
 
 
-    public BoardUI(PrintStream out, ChessGame game) {
-        BoardUI.game = game;
-        BoardUI.out = out;
-        board = new ChessBoard();
+    public BoardUI(PrintStream outStream, ChessGame gameState) {
+        game = gameState;
+        out = outStream;
+        board = game.getBoard();
     }
 
 

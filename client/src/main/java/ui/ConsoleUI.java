@@ -3,9 +3,7 @@ package ui;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Scanner;
+import java.util.*;
 
 import chess.*;
 import client.ServerFacade;
@@ -60,7 +58,7 @@ public class ConsoleUI {
     }
 
 
-    public void preLogin(String input) {
+    private void preLogin(String input) {
         switch (input) {
             case "register":
                 register();
