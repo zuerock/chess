@@ -105,6 +105,30 @@ public class ConsoleUI {
         }
     }
 
+    private void redraw() {
+        new BoardUI(out, game);
+        BoardUI.printBoard();
+    }
+
+    private void makeMove() {
+        try {
+            out.println("Which piece would you like to move? (ex: E4): ");
+            String inputStart = in.nextLine();
+            ChessPosition start = toPos(inputStart);
+
+            out.println("Where would you like to move it? (ex: E5): ");
+            String inputEnd = in.nextLine();
+            ChessPosition end = toPos(inputEnd);
+
+            ChessMove move = new ChessMove(start, end, null);
+            facade.makeMove(move);
+            new BoardUI(out, game);
+            BoardUI.printBoard();
+        } catch (Exception e) {
+            out.println(e.getMessage());
+        }
+    }
+
     private void inGame(String input){
 
         switch (input) {
