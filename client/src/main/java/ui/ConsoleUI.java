@@ -207,11 +207,13 @@ public class ConsoleUI {
 
                 if (team.equals("WHITE")){
                     teamColor = WHITE;
-                    new BoardUI(out, game).printBoard(teamColor);
+                    new BoardUI(out, game);
+                    BoardUI.printBoard(teamColor);
                 }
                 else{
                     teamColor = ChessGame.TeamColor.BLACK;
-                    new BoardUI(out, game).printBoard(teamColor);
+                    new BoardUI(out, game);
+                    BoardUI.printBoard(teamColor);
                 }
             } catch (Exception e) {
                 out.println(e.getMessage());
