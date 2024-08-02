@@ -89,9 +89,73 @@ public class ServerFacadeTests {
         }
     }
 
+    @Nested
+    class ListGamesTests {
 
+        @Test
+        void goodListGames() throws Exception {
+            AuthData authData = registerSetup("testUser", "testPassword", "testEmail");
 
+            facade.createGame(authData.authToken(), "testGame");
+            facade.createGame(authData.authToken(), "testGame2");
 
+            assertEquals(2, facade.listGames(authData.authToken()).size());
+        }
+
+        @Test
+        void badListGames()  {
+            Assertions.assertThrows(IOException.class, () -> facade.listGames("badAuthToken"));
+        }
+    }
+
+    @Nested
+    class CreateGameTests {
+
+        @Test
+        void goodCreateGame() throws Exception {
+            AuthData authData = registerSetup("testUser", "testPassword", "testEmail");
+
+            int id = -1;
+            id = facade.createGame(authData.authToken(), "testGame");
+            assertTrue(id > 0);
+        }
+
+        @Test
+        void badCreateGame() throws Exception {
+            AuthData authData = registerSetup("testUser", "testPassword", "testEmail");
+
+            // attempt to make the same game twice
+            facade.createGame(authData.authToken(), "testGame");
+            Assertions.assertThrows(IOException.class, () -> facade.createGame(authData.authToken(), "testGame"));
+        }
+    }
+
+    @Nested
+    class JoinGameTests {
+
+        @Test
+        void goodJoinGame() throws Exception {
+            AuthData loginData = registerSetup("testUser", "testPassword", "testEmail");
+            Integer gameID = facade.createGame(loginData.authToken(), "testGame");
+
+            int responseCode = facade.joinGame(loginData.authToken(), "WHITE", gameID);
+            assertEquals(200, responseCode);
+        }
+
+        @Test
+        void badJoinGame() throws Exception {
+            AuthData whiteAuth = registerSetup("whiteUser", "whitePassword", "white@email.com");
+            Integer gameID = facade.createGame(whiteAuth.authToken(), "testGame");
+
+            // join whiteUser as white
+            facade.joinGame(whiteAuth.authToken(), "WHITE", gameID);
+            facade.logout(whiteAuth.authToken());
+
+            // create black user, attempt to join as white
+            AuthData blackAuth = registerSetup("blackUser", "blackPassword", "black@email.com");
+            Assertions.assertThrows(IOException.class, () -> facade.joinGame(blackAuth.authToken(), "WHITE", gameID));
+        }
+    }
 
 
     AuthData registerSetup(String username, String password, String email) throws IOException {
