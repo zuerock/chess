@@ -105,6 +105,31 @@ public class ConsoleUI {
         }
     }
 
+    private void inGame(String input){
+
+        switch (input) {
+            case "redraw":
+                //redraw();
+                break;
+            case "make move":
+               // makeMove();
+                break;
+            case "resign":
+                //resign();
+                break;
+            case "highlight":
+                //highlight();
+                break;
+            case "help":
+                help();
+                break;
+            case "exit", "quit", "leave":
+                break;
+            default:
+                out.println("Invalid command. Type 'help' for a list of commands. //INGAME");
+        }
+    }
+
 
     private void logout() {
         try {
