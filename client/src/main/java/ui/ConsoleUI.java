@@ -34,6 +34,8 @@ public class ConsoleUI {
         numberedList = new HashMap<>();
     }
 
+    // prepare to move
+
 
     public void run() {
         out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
