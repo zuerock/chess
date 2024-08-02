@@ -149,6 +149,7 @@ public class BoardUI {
         }
         return pieceString;
     }
+
     public void printValidMoves(Collection<ChessPosition> endPositions, ChessPosition pos, ChessGame.TeamColor teamState) {
         out.println();
         teamColor = teamState;
@@ -182,6 +183,7 @@ public class BoardUI {
                 break;
         }
     }
+
     private void printValRow(int row, int col, Collection<ChessPosition> endPositions, ChessPosition pos) {
         // print side header squares
         if (col == 0 || col == DRAWING_SIZE_IN_SQUARES - 1) {
@@ -215,5 +217,21 @@ public class BoardUI {
                     if (isMove(row, col, endPositions)) out.print(SET_BG_COLOR_DARK_GREEN);
                     else if (pos.getRow() == row && pos.getColumn() == col) out.print(SET_BG_COLOR_YELLOW);
                     else out.print(SET_BG_COLOR_BLACK);
+                }
+            }
+            String piece = getPiece(row, col);
+            out.print(piece);
+            out.print(RESET_TEXT_COLOR);
+        }
+    }
+
+    private boolean isMove(int row, int col, Collection<ChessPosition> endPositions) {
+        for (ChessPosition pos : endPositions) {
+            if (pos.getRow() == row && pos.getColumn() == col) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
 
