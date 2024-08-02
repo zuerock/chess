@@ -21,6 +21,7 @@ public class ConsoleUI {
     private Map<Integer, GameData> numberedList;
 
     boolean loggedIn;
+    boolean inGame;
 
     PrintStream out;
     Scanner in;
@@ -31,6 +32,7 @@ public class ConsoleUI {
         board = new ChessBoard();
         game = new ChessGame();
         loggedIn = false;
+        inGame = false;
         numberedList = new HashMap<>();
     }
 
@@ -129,6 +131,20 @@ public class ConsoleUI {
         }
     }
 
+    private void resign() {
+        out.println("Are you sure you want to resign? (y/n): ");
+        String input = in.nextLine();
+        if (input.equals("y")) {
+            try {
+                facade.resign(auth.authToken());
+                out.println("You have resigned the game.");
+                inGame = false;
+            } catch (Exception e) {
+                out.println("Failed to resign.");
+            }
+        }
+    }
+
     private void inGame(String input){
 
         switch (input) {
@@ -152,6 +168,44 @@ public class ConsoleUI {
             default:
                 out.println("Invalid command. Type 'help' for a list of commands. //INGAME");
         }
+    }
+
+    private void highlight() {
+        out.println("Which piece's moves would you like to highlight? (ex: E4): ");
+        String input = in.nextLine();
+
+
+        ChessPosition pos = toPos(input);
+
+        try {
+            Collection<ChessMove> moves = facade.getValidMoves(pos);
+            Collection<ChessPosition> endPositions = moves.stream().map(ChessMove::getEndPosition).toList();
+            new BoardUI(out, game).printValidMoves(endPositions, pos, playerColor);
+        } catch (Exception e) {
+            out.println("Invalid move.");
+        }
+    }
+
+    private ChessPosition toPos(String input) {
+        if (input.length() != 2) {
+            throw new IllegalArgumentException("Invalid input. Please enter a valid chess position (ex: E4).");
+        }
+
+        char colChar = input.charAt(0);
+        char rowChar = input.charAt(1);
+
+        if (!Character.isLetter(colChar) || !Character.isDigit(rowChar)) {
+            throw new IllegalArgumentException("Invalid input. Please enter a valid chess position (ex: E4).");
+        }
+
+        int col = colChar - 'A' + 1;
+        int row = Character.getNumericValue(rowChar);
+
+        if (col < 1 || col > 8 || row < 1 || row > 8) {
+            throw new IllegalArgumentException("Invalid input. Please enter a valid chess position (ex: E4).");
+        }
+
+        return new ChessPosition(row, col);
     }
 
 
