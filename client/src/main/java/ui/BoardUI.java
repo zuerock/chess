@@ -149,5 +149,38 @@ public class BoardUI {
         }
         return pieceString;
     }
+    public void printValidMoves(Collection<ChessPosition> endPositions, ChessPosition pos, ChessGame.TeamColor teamState) {
+        out.println();
+        teamColor = teamState;
+
+        // draw board
+        drawHeader();
+        drawValRows(endPositions, pos);
+        drawHeader();
+    }
+
+    private void drawValRows(Collection<ChessPosition> endPositions, ChessPosition pos) {
+        switch (teamColor) {
+            case WHITE:
+                for (int row = BOARD_SIZE_IN_SQUARES; row >= 1; row--) {
+                    for (int col = 0; col < DRAWING_SIZE_IN_SQUARES; col++) {
+                        printValRow(row, col, endPositions, pos);
+                    }
+                    out.println(RESET_BG_COLOR);
+                }
+                break;
+
+            case BLACK:
+                for (int row = 1; row <= BOARD_SIZE_IN_SQUARES; row++) {
+
+
+                    for (int col = DRAWING_SIZE_IN_SQUARES - 1; col >= 0; col--) {
+                        printValRow(row, col, endPositions, pos);
+                    }
+                    out.println(RESET_BG_COLOR);
+                }
+                break;
+        }
+    }
 }
 
