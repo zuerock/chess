@@ -55,12 +55,12 @@ public class MyAPITests {
             AuthDAO auths = new MemoryAuthDAO();
 
             // store a user with the username "copycat"
-            users.createUser(new UserData("testUser", "testPassword", "testEmail"));
+            users.createUser(new UserData("copycat", "testPassword", "testEmail"));
 
             // run test here -> should throw exception "already taken"
             UserService userService = new UserService();
             Exception exception = assertThrows(DataAccessException.class, () -> {
-                userService.register(new UserData("testUser", "testPassword", "testEmail"));
+                userService.register(new UserData("copycat", "testPassword", "testEmail"));
             });
             assertEquals("already taken", exception.getMessage());
         }
@@ -72,7 +72,7 @@ public class MyAPITests {
             UserService userService = new UserService();
 
             // run test here -> should return an AuthData object
-            AuthData testAuthData = userService.login(new UserData("testUser", "testPassword", "testEmail"));
+            AuthData testAuthData = userService.register(new UserData("testUser", "testPassword", "testEmail"));
             System.out.println("AuthData: " + testAuthData);
         }
 
@@ -158,7 +158,7 @@ public class MyAPITests {
 
             // create and register a test user
             UserData testUser = new UserData("testUser", "testPassword", "testEmail");
-            userService.login(testUser);
+            userService.register(testUser);
 
             // login the test user
             AuthData testToken = userService.login(testUser);
@@ -177,7 +177,7 @@ public class MyAPITests {
 
             // create and register a test user
             UserData testUser = new UserData("testUser", "testPassword", "testEmail");
-            userService.login(testUser);
+            userService.register(testUser);
 
             // login the test user
             AuthData testToken = userService.login(testUser);
@@ -201,7 +201,7 @@ public class MyAPITests {
 
             // create and register a test user
             UserData testUser = new UserData("testUser", "testPassword", "testEmail");
-            userService.login(testUser);
+            userService.register(testUser);
 
             // login the test user, get auth token back
             AuthData testToken = userService.login(testUser);
@@ -210,7 +210,7 @@ public class MyAPITests {
             // TEST RUN HERE -> create game, get gameID back
             GameService gameService = new GameService();
             Integer gameID = -1;
-           // gameID = gameService.createGame(token, "testGame");
+            gameID = gameService.createGame(token, "testGame");
 
             if (gameID == -1) System.out.println("ERROR: Game not created");
             else System.out.println("SUCCESS! :: GameID: " + gameID);
@@ -225,7 +225,7 @@ public class MyAPITests {
 
             // create and register a test user
             UserData testUser = new UserData("testUser", "testPassword", "testEmail");
-            userService.login(testUser);
+            userService.register(testUser);
 
             // login the test user, get auth token back
             AuthData testToken = userService.login(testUser);
@@ -235,7 +235,7 @@ public class MyAPITests {
             GameService gameService = new GameService();
 
             // create a game with the name "testGame"
-           // gameService.createGame(token, "testGame");
+            gameService.createGame(token, "testGame");
 
             // TEST HERE -> create duplicate game "testGame"
             Exception exception = assertThrows(DataAccessException.class, () -> {
@@ -256,7 +256,7 @@ public class MyAPITests {
 
             // create and register a test user
             UserData testUser = new UserData("testUser", "testPassword", "testEmail");
-            userService.login(testUser);
+            userService.register(testUser);
 
             // login the test user, get auth token back
             AuthData testToken = userService.login(testUser);
@@ -266,9 +266,9 @@ public class MyAPITests {
             GameService gameService = new GameService();
 
             // create some games
-            //gameService.createGame(token, "testGame1");
-            //gameService.createGame(token, "testGame2");
-            //gameService.createGame(token, "testGame3");
+            gameService.createGame(token, "testGame1");
+            gameService.createGame(token, "testGame2");
+            gameService.createGame(token, "testGame3");
 
             // TEST HERE -> list games
             System.out.println("Games: " + gameService.listGames(token));
@@ -282,18 +282,18 @@ public class MyAPITests {
             UserService userService = new UserService();
 
             // create and register a test user
-            UserData testUser1 = new UserData("testUser1", "testPassword", "testEmail");
-            userService.login(testUser1);
+            UserData testUser = new UserData("testUser", "testPassword", "testEmail");
+            userService.register(testUser);
 
             // login the test user, get auth token back
-            AuthData testToken = userService.login(testUser1);
+            AuthData testToken = userService.login(testUser);
             String token = testToken.authToken();
 
 
             GameService gameService = new GameService();
 
             // create some games
-            //gameService.createGame(token, "testGame1");
+            gameService.createGame(token, "testGame1");
             gameService.createGame(token, "testGame2");
             gameService.createGame(token, "testGame3");
 
@@ -341,28 +341,28 @@ public class MyAPITests {
             UserService userService = new UserService();
 
             // create and register two test users
-            UserData testUser1 = new UserData("testUser1", "testPassword", "testEmail");
+            UserData testUser = new UserData("testUser", "testPassword", "testEmail");
             UserData testUser2 = new UserData("testUser2", "testPassword2", "testEmail2");
-            userService.register(testUser1);
+            userService.register(testUser);
             userService.register(testUser2);
 
             // login the test users, get auth tokens back
-            AuthData testToken = userService.login(testUser1);
+            AuthData testToken = userService.login(testUser);
             String token = testToken.authToken();
 
             AuthData testToken2 = userService.login(testUser2);
             String token2 = testToken2.authToken();
 
 
-            GameService gameService1 = new GameService();
+            GameService gameService = new GameService();
 
             // create a game, populate with a white player
-            Integer gameID = gameService1.createGame(token, "testGame1");
-            gameService1.joinGame(token, "WHITE", gameID);
+            Integer gameID = gameService.createGame(token, "testGame");
+            gameService.joinGame(token, "WHITE", gameID);
 
             // TEST HERE -> join game with another white player
             Exception exception = assertThrows(DataAccessException.class, () -> {
-                gameService1.joinGame(token2, "WHITE", gameID);
+                gameService.joinGame(token2, "WHITE", gameID);
             });
             assertEquals("already taken", exception.getMessage());
         }

@@ -2,10 +2,7 @@ package ui;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Scanner;
+import java.util.*;
 
 import chess.*;
 import client.ServerFacade;
@@ -23,24 +20,27 @@ public class ConsoleUI {
     private Map<Integer, GameData> numberedList;
 
     boolean loggedIn;
+    boolean inGame;
+    boolean isObserver;
 
     PrintStream out;
-    Scanner in;
-    private ChessGame.TeamColor teamColor;
+    Scanner scanner;
+    private ChessGame.TeamColor playerColor;
 
     public ConsoleUI(ServerFacade facade) {
         this.facade = facade;
         board = new ChessBoard();
         game = new ChessGame();
         loggedIn = false;
+        inGame = false;
+        isObserver = true;
         numberedList = new HashMap<>();
     }
-
 
     public void run() {
         out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         String input = "";
-        in = new Scanner(System.in);
+        scanner = new Scanner(System.in);
 
         out.print(ERASE_SCREEN);
         out.println("♕ Welcome to 240 chess. Type 'help' to get started. ♕");
@@ -48,19 +48,20 @@ public class ConsoleUI {
         while (!Objects.equals(input, "quit")) {
             if (!(loggedIn)) {
                 out.print("[LOGGED_OUT] >>> ");
-                input = in.nextLine();
+                input = scanner.nextLine();
                 preLogin(input);
             } else {
                 out.print("[LOGGED_IN] >>> ");
-                input = in.nextLine();
-                postLogin(input);
+                input = scanner.nextLine();
+                if (inGame) inGame(input);
+                else postLogin(input);
             }
         }
         out.println("Hope you had fun, bye!");
     }
 
 
-    public void preLogin(String input) {
+    private void preLogin(String input) {
         switch (input) {
             case "register":
                 register();
@@ -71,7 +72,7 @@ public class ConsoleUI {
             case "help":
                 help();
                 break;
-            case "quit":
+            case "exit", "quit":
                 break;
             default:
                 out.println("Invalid command. Type 'help' for a list of commands.");
@@ -98,14 +99,116 @@ public class ConsoleUI {
             case "help":
                 help();
                 break;
-            case "quit":
+            case "exit", "quit":
                 break;
             default:
                 out.println("Invalid command. Type 'help' for a list of commands.");
         }
     }
 
+    private void inGame(String input){
 
+        switch (input) {
+            case "redraw":
+                redraw();
+                break;
+            case "make move":
+                makeMove();
+                break;
+            case "resign":
+                resign();
+                break;
+            case "highlight":
+                highlight();
+                break;
+            case "help":
+                help();
+                break;
+            case "exit", "quit", "leave":
+                inGame = false;
+                break;
+            default:
+                out.println("Invalid command. Type 'help' for a list of commands. //INGAME");
+        }
+    }
+
+    // INGAME LOGIC
+    private void redraw() {
+        new BoardUI(out, game).printBoard();
+    }
+
+    private void makeMove() {
+        try {
+            out.println("Which piece would you like to move? (ex: E4): ");
+            String inputStart = scanner.nextLine();
+            ChessPosition start = toPos(inputStart);
+
+            out.println("Where would you like to move it? (ex: E5): ");
+            String inputEnd = scanner.nextLine();
+            ChessPosition end = toPos(inputEnd);
+
+            ChessMove move = new ChessMove(start, end, null);
+            facade.makeMove(move);
+            new BoardUI(out, game).printBoard();
+        } catch (Exception e) {
+            out.println(e.getMessage());
+        }
+    }
+
+    private void resign() {
+        out.println("Are you sure you want to resign? (y/n): ");
+        String input = scanner.nextLine();
+        if (input.equals("y")) {
+            try {
+                facade.resign(auth.authToken());
+                out.println("You have resigned the game.");
+                inGame = false;
+            } catch (Exception e) {
+                out.println("Failed to resign.");
+            }
+        }
+    }
+
+    private void highlight() {
+        out.println("Which piece's moves would you like to highlight? (ex: E4): ");
+        String input = scanner.nextLine();
+
+
+        ChessPosition pos = toPos(input);
+
+        try {
+            Collection<ChessMove> moves = facade.getValidMoves(pos);
+            Collection<ChessPosition> endPositions = moves.stream().map(ChessMove::getEndPosition).toList();
+            new BoardUI(out, game).printValidMoves(endPositions, pos, playerColor);
+        } catch (Exception e) {
+            out.println("Invalid move.");
+        }
+    }
+
+    private ChessPosition toPos(String input) {
+        if (input.length() != 2) {
+            throw new IllegalArgumentException("Invalid input. Please enter a valid chess position (ex: E4).");
+        }
+
+        char colChar = input.charAt(0);
+        char rowChar = input.charAt(1);
+
+        if (!Character.isLetter(colChar) || !Character.isDigit(rowChar)) {
+            throw new IllegalArgumentException("Invalid input. Please enter a valid chess position (ex: E4).");
+        }
+
+        int col = colChar - 'A' + 1;
+        int row = Character.getNumericValue(rowChar);
+
+        if (col < 1 || col > 8 || row < 1 || row > 8) {
+            throw new IllegalArgumentException("Invalid input. Please enter a valid chess position (ex: E4).");
+        }
+
+        return new ChessPosition(row, col);
+    }
+
+
+    // STANDARD LOGIC
     private void logout() {
         try {
             facade.logout(auth.authToken());
@@ -117,22 +220,22 @@ public class ConsoleUI {
     }
 
     private void observe() {
-        out.print("Enter the ID of the game you'd like to observe: ");
-        String input = in.nextLine();
-
+        out.print("Enter the number of the game you'd like to observe: ");
+        String input = scanner.nextLine();
 
         if (isInList(input)) {
-            int gameID = Integer.parseInt(input);
-            GameData listedGame = numberedList.get(gameID);
+            int gameNum = Integer.parseInt(input);
+            GameData listedGame = numberedList.get(gameNum);
             game = listedGame.game();
 
-            new BoardUI(out, game);
+            // print out board
+            new BoardUI(out, game).printBoard(WHITE);
         }
     }
 
     private void play() {
-        out.print("Enter either the number or ID of the game you'd like to join: ");
-        String input = in.nextLine();
+        out.print("Enter either the number of the game you'd like to join: ");
+        String input = scanner.nextLine();
 
         if (isInList(input)) {
             // get game ID from list
@@ -142,7 +245,7 @@ public class ConsoleUI {
 
             // get desired team
             out.print("Please enter your desired team (WHITE or BLACK): ");
-            String givenTeam = in.nextLine();
+            String givenTeam = scanner.nextLine();
             String team = givenTeam.toUpperCase(); // in case they give a lowercase team
             // check if input is valid
             if (!team.equals("WHITE") && !team.equals("BLACK")) {
@@ -150,22 +253,26 @@ public class ConsoleUI {
                 return;
             }
 
+            // join game
             try {
                 facade.joinGame(auth.authToken(), team, gameID);
-                out.println("Joined game [" + gameID + "] as the " + team + " player");
+                out.println("Joined ["+ listedGame.gameName() + "] as the " + team + " player");
 
+                // proceed to inGame ui
                 game = listedGame.game();
+                this.inGame = true;
 
                 if (team.equals("WHITE")){
-                    teamColor = WHITE;
-                    new BoardUI(out, game).printBoard(teamColor);
+                    playerColor = ChessGame.TeamColor.WHITE;
+                    new BoardUI(out, game).printBoard(WHITE);
                 }
                 else{
-                    teamColor = ChessGame.TeamColor.BLACK;
-                    new BoardUI(out, game).printBoard(teamColor);
+                    playerColor = ChessGame.TeamColor.BLACK;
+                    new BoardUI(out, game).printBoard(ChessGame.TeamColor.BLACK);
                 }
+
             } catch (Exception e) {
-                out.println(e.getMessage());
+                out.println("Failed to join game");
             }
         }
     }
@@ -177,7 +284,7 @@ public class ConsoleUI {
             if (numberedList != null) numberedList.clear();
             out.println("Games:");
             for (var game : gamesList) {
-                out.println(i + " -- Name: " + game.gameName() + ", ID: " + game.gameID() + ", White player: " + game.whiteUsername() + ", Black player: " + game.blackUsername());
+                out.println(i + " -- Name: " + game.gameName() + ", White player: " + game.whiteUsername() + ", Black player: " + game.blackUsername());
                 numberedList.put(i, game);
                 i++;
             }
@@ -188,22 +295,22 @@ public class ConsoleUI {
 
     private void create() {
         out.print("Enter a new game name: ");
-        String gameName = in.nextLine();
+        String gameName = scanner.nextLine();
         try {
             int id = facade.createGame(auth.authToken(), gameName);
-            out.println("Game created with ID: " + id);
+            out.println("Game created");
         } catch (Exception e) {
             out.println(e.getMessage());
         }
     }
 
-    public void register() {
+    public void register (){
         out.print("Enter new username: ");
-        String username = in.nextLine();
+        String username = scanner.nextLine();
         out.print("Enter new password: ");
-        String password = in.nextLine();
+        String password = scanner.nextLine();
         out.print("Enter new email: ");
-        String email = in.nextLine();
+        String email = scanner.nextLine();
 
         try {
             auth = facade.register(username, password, email);
@@ -214,11 +321,11 @@ public class ConsoleUI {
         }
     }
 
-    public void login() {
+    public void login (){
         out.print("Enter username: ");
-        String username = in.nextLine();
+        String username = scanner.nextLine();
         out.print("Enter password: ");
-        String password = in.nextLine();
+        String password = scanner.nextLine();
 
         try {
             auth = facade.login(username, password);
@@ -231,12 +338,21 @@ public class ConsoleUI {
 
     public void help() {
         if (loggedIn) {
-            out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "create" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - make a new game");
-            out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "list" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - get a list of games");
-            out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "play" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - join a game as either BLACK or WHITE");
-            out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "observe" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - view a game as a spectator");
-            out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "logout" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - logout and return to the main menu");
-        } else {
+            if (inGame) {
+                out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "make move" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - make a move in the game");
+                out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "highlight" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - highlight possible legal moves");
+                out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "redraw" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - redraw the board");
+                out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "leave" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - leave the game");
+                out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "resign" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - resign the game");
+            } else {
+                out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "create" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - make a new game");
+                out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "list" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - get a list of games");
+                out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "play" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - join a game as either BLACK or WHITE");
+                out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "observe" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - view a game as a spectator");
+                out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "logout" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - logout and return to the main menu");
+            }
+        }
+        else {
             out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "register" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - to create an account");
             out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "login" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - to login");
         }
@@ -245,18 +361,20 @@ public class ConsoleUI {
     }
 
     private boolean isInList(String input) {
-        int gameID = 0;
-
+        int gameNum = 0;
+        // check valid input
         try {
-            gameID = Integer.parseInt(input);
+            gameNum = Integer.parseInt(input);
         } catch (NumberFormatException e) {
-            out.println("Invlaid input. Please try again.");
+            out.println("Invalid input. Please enter a number.");
             return false;
         }
-        if (!numberedList.containsKey(gameID)){
-            out.println("Invalid game. Please enter a valid number (try 'list').");
+
+        if (numberedList == null || !numberedList.containsKey(gameNum)) {
+            out.println("That game doesn't exist. Please enter a valid number (use 'list' to see available games).");
             return false;
         }
         return true;
     }
+
 }
