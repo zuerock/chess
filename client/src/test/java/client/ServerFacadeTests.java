@@ -115,7 +115,7 @@ public class ServerFacadeTests {
         void goodCreateGame() throws Exception {
             AuthData authData = registerSetup("testUser", "testPassword", "testEmail");
 
-            int id = -1;
+            int id;
             id = facade.createGame(authData.authToken(), "testGame");
             assertTrue(id > 0);
         }
@@ -152,7 +152,7 @@ public class ServerFacadeTests {
             facade.logout(whiteAuth.authToken());
 
             // create black user, attempt to join as white
-           AuthData blackAuth = registerSetup("blackUser", "blackPassword", "black@email.com");
+            AuthData blackAuth = registerSetup("blackUser", "blackPassword", "black@email.com");
             Assertions.assertThrows(IOException.class, () -> facade.joinGame(blackAuth.authToken(), "WHITE", gameID));
         }
     }
