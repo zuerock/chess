@@ -4,34 +4,37 @@ import java.io.PrintStream;
 import java.util.Collection;
 
 import chess.*;
+
 import static ui.EscapeSequences.*;
 
 public class BoardUI {
     private static final int DRAWING_SIZE_IN_SQUARES = 10;
     private static final int BOARD_SIZE_IN_SQUARES = 8;
 
-    private static ChessGame game;
     private static ChessBoard board;
     private static PrintStream out;
-    private static ChessGame.TeamColor team;
+    private static ChessGame game;
+    private static ChessGame.TeamColor teamColor;
 
-    public BoardUI(PrintStream outStream, ChessGame givenGame) {
-        game = givenGame;
-        board = game.getBoard();
+
+    public BoardUI(PrintStream outStream, ChessGame gameState) {
+        game = gameState;
         out = outStream;
+        board = game.getBoard();
     }
 
-    public void printBoard() { // print board for current team
-        team = game.getTeamTurn();
+
+    public static void printBoard() { // print board for current team
+        teamColor = game.getTeamTurn();
         printBoard(game.getTeamTurn());
     }
 
-    public void printBoard(ChessGame.TeamColor givenTeam) { // if given a specific team, print that board instead
-        team = givenTeam;
+    public static void printBoard(ChessGame.TeamColor givenTeam) { // if given a specific team, print that board instead
+        teamColor = givenTeam;
 
         out.println();
         drawHeader();
-        drawRows();
+        prepareRows();
         drawHeader();
     }
 
@@ -41,7 +44,7 @@ public class BoardUI {
         out.print(SET_BG_COLOR_LIGHT_GREY);
         out.print(SET_TEXT_COLOR_BLACK);
 
-        headerLine = switch (team) {
+        headerLine = switch (teamColor) {
             case WHITE -> "    A   B  C   D   E  F   G   H    ";
 
             case BLACK -> "    H   G  F   E   D  C   B   A    ";
@@ -53,8 +56,9 @@ public class BoardUI {
         out.println(RESET_BG_COLOR);
     }
 
-    private static void drawRows() {
-        switch (team) {
+
+    private static void prepareRows() {
+        switch (teamColor) {
             case WHITE:
                 for (int row = BOARD_SIZE_IN_SQUARES; row >= 1; row--) {
                     for (int col = 0; col < DRAWING_SIZE_IN_SQUARES; col++) {
@@ -93,15 +97,15 @@ public class BoardUI {
             // set square color
             if (row % 2 == 0) {
                 if (col % 2 == 0) {
-                    out.print(SET_BG_COLOR_DARK_PURPLE);
+                    out.print(SET_BG_COLOR_BLACK);
                 } else {
-                    out.print(SET_BG_COLOR_LIGHT_PURPLE);
+                    out.print(SET_BG_COLOR_WHITE);
                 }
             } else {
                 if (col % 2 == 0) {
-                    out.print(SET_BG_COLOR_LIGHT_PURPLE);
+                    out.print(SET_BG_COLOR_WHITE);
                 } else {
-                    out.print(SET_BG_COLOR_DARK_PURPLE);
+                    out.print(SET_BG_COLOR_BLACK);
                 }
             }
 
@@ -121,29 +125,34 @@ public class BoardUI {
         ChessPiece piece = board.getPiece(position);
         String pieceString = "";
 
-        switch (piece.getPieceType()) {
-            case KING -> pieceString = KING_PIECE;
-            case QUEEN -> pieceString = QUEEN_PIECE;
-            case ROOK -> pieceString = ROOK_PIECE;
-            case BISHOP -> pieceString = BISHOP_PIECE;
-            case KNIGHT -> pieceString = KNIGHT_PIECE;
-            case PAWN -> pieceString = PAWN_PIECE;
-        }
-
         switch (piece.getTeamColor()) {
             case WHITE -> {
-                out.print(SET_TEXT_COLOR_WHITE);
+                switch (piece.getPieceType()) {
+                    case KING -> pieceString = WHITE_KING;
+                    case QUEEN -> pieceString = WHITE_QUEEN;
+                    case ROOK -> pieceString = WHITE_ROOK;
+                    case BISHOP -> pieceString = WHITE_BISHOP;
+                    case KNIGHT -> pieceString = WHITE_KNIGHT;
+                    case PAWN -> pieceString = WHITE_PAWN;
+                }
             }
             case BLACK -> {
-                out.print(SET_TEXT_COLOR_BLACK);
+                switch (piece.getPieceType()) {
+                    case KING -> pieceString = BLACK_KING;
+                    case QUEEN -> pieceString = BLACK_QUEEN;
+                    case ROOK -> pieceString = BLACK_ROOK;
+                    case BISHOP -> pieceString = BLACK_BISHOP;
+                    case KNIGHT -> pieceString = BLACK_KNIGHT;
+                    case PAWN -> pieceString = BLACK_PAWN;
+                }
             }
         }
         return pieceString;
     }
 
-    public void printValidMoves(Collection<ChessPosition> endPositions, ChessPosition pos, ChessGame.TeamColor givenTeam) {
+    public void printValidMoves(Collection<ChessPosition> endPositions, ChessPosition pos, ChessGame.TeamColor teamState) {
         out.println();
-        team = givenTeam;
+        teamColor = teamState;
 
         // draw board
         drawHeader();
@@ -152,7 +161,7 @@ public class BoardUI {
     }
 
     private void drawValRows(Collection<ChessPosition> endPositions, ChessPosition pos) {
-        switch (team) {
+        switch (teamColor) {
             case WHITE:
                 for (int row = BOARD_SIZE_IN_SQUARES; row >= 1; row--) {
                     for (int col = 0; col < DRAWING_SIZE_IN_SQUARES; col++) {
@@ -193,24 +202,23 @@ public class BoardUI {
                 if (col % 2 == 0) {
                     if (isMove(row, col, endPositions)) out.print(SET_BG_COLOR_DARK_GREEN);
                     else if (pos.getRow() == row && pos.getColumn() == col) out.print(SET_BG_COLOR_YELLOW);
-                    else out.print(SET_BG_COLOR_DARK_PURPLE);
+                    else out.print(SET_BG_COLOR_BLACK);
                 } else {
                     if (isMove(row, col, endPositions)) out.print(SET_BG_COLOR_GREEN);
                     else if (pos.getRow() == row && pos.getColumn() == col) out.print(SET_BG_COLOR_YELLOW);
-                    else out.print(SET_BG_COLOR_LIGHT_PURPLE);
+                    else out.print(SET_BG_COLOR_WHITE);
                 }
             } else {
                 if (col % 2 == 0) {
                     if (isMove(row, col, endPositions)) out.print(SET_BG_COLOR_GREEN);
                     else if (pos.getRow() == row && pos.getColumn() == col) out.print(SET_BG_COLOR_YELLOW);
-                    else out.print(SET_BG_COLOR_LIGHT_PURPLE);
+                    else out.print(SET_BG_COLOR_WHITE);
                 } else {
                     if (isMove(row, col, endPositions)) out.print(SET_BG_COLOR_DARK_GREEN);
                     else if (pos.getRow() == row && pos.getColumn() == col) out.print(SET_BG_COLOR_YELLOW);
-                    else out.print(SET_BG_COLOR_DARK_PURPLE);
+                    else out.print(SET_BG_COLOR_BLACK);
                 }
             }
-
             String piece = getPiece(row, col);
             out.print(piece);
             out.print(RESET_TEXT_COLOR);

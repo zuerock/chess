@@ -2,7 +2,6 @@ package server;
 
 import com.google.gson.Gson;
 import model.*;
-import server.websocket.WSServer;
 import service.*;
 import spark.*;
 import dataaccess.*;
@@ -11,8 +10,6 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Map;
 
-import static spark.Spark.webSocket;
-
 public class Server {
     private final UserService userService = new UserService();
     private final GameService gameService = new GameService();
@@ -20,15 +17,13 @@ public class Server {
 
     public static void main(String[] args) {
         Server server = new Server();
-        server.run(8080);
+        server.run(Integer.parseInt(args[0]));
     }
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");
-
-        webSocket("/ws", WSServer.class);
 
         // Initialize the database
         try {

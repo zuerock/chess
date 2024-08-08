@@ -88,7 +88,7 @@ public class GameService {
         return 1000 + generator.nextInt(9000);
     }
 
-    public boolean isValid(String authToken) throws DataAccessException {
+    private boolean isValid(String authToken) throws DataAccessException {
         if (authToken == null) return false;
         return Objects.equals(authDAO.getAuth(authToken), authToken);
     }

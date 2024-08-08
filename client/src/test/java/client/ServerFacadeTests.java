@@ -152,7 +152,7 @@ public class ServerFacadeTests {
             facade.logout(whiteAuth.authToken());
 
             // create black user, attempt to join as white
-           AuthData blackAuth = registerSetup("blackUser", "blackPassword", "black@email.com");
+            AuthData blackAuth = registerSetup("blackUser", "blackPassword", "black@email.com");
             Assertions.assertThrows(IOException.class, () -> facade.joinGame(blackAuth.authToken(), "WHITE", gameID));
         }
     }
